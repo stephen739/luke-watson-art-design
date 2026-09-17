@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luke Watson Art &amp; Design</title>
+<meta name="description" content="Luke Watson is a Lubbock, Texas artist and graphic designer. Original wildlife paintings, graphic design, and how to get in touch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@600;700&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap">
+<style>
+  :root{
+    --paper:#FFFFFF;
+    --paper-soft:#F4F4F2;
+    --ink:#16150F;
+    --ink-soft:#514E42;
+    --sage:#8FB47A;
+    --gold:#EFBB3E;
+    --blush:#E39AA6;
+    --sky:#7FBBD4;
+    --line: rgba(22,21,15,.16);
+    --nav-h: 76px;
+    --display: "Anton", "Arial Narrow", sans-serif;
+    --script: "Caveat", "Segoe Script", cursive;
+    --body: "Work Sans", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  html{ scroll-behavior:smooth; scroll-padding-top: 110px; }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    -webkit-font-smoothing:antialiased;
+    margin:0;
+  }
+
+  *{ box-sizing:border-box; }
+  img{ max-width:100%; display:block; }
+  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+  .wrap{ max-width:1100px; margin-inline:auto; padding-inline:20px; }
+  section{ padding-block: clamp(56px,9vw,110px); position:relative; }
+
+  h1,h2,h3{ font-family:var(--display); text-transform:uppercase; letter-spacing:.01em; text-wrap:balance; margin:0; line-height:1; }
+  p{ line-height:1.65; color:var(--ink-soft); margin:0; }
+  a{ color:inherit; }
+
+  .eyebrow{
+    font-family:var(--body); font-weight:700; font-size:.72rem;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft);
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;
+  }
+  .eyebrow::before{ content:""; width:22px; height:2px; background:var(--gold); display:inline-block; }
+
+  /* ---------- Header ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background:rgba(255,255,255,.86); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    max-width:1100px; margin-inline:auto; padding:14px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .brand{
+    font-family:var(--display); font-size:1.15rem; letter-spacing:.03em;
+    text-decoration:none; white-space:nowrap; display:flex; align-items:center;
+  }
+  .brand span{ color:var(--sage); }
+  .brand-logo{ height:38px; width:auto; }
+  .navlinks{ display:flex; gap:clamp(14px,3vw,28px); list-style:none; margin:0; padding:0; flex-wrap:wrap; }
+  .navlinks a{
+    text-decoration:none; font-weight:600; font-size:.85rem; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--ink-soft); position:relative; padding-bottom:4px;
+    transition:color .2s ease;
+  }
+  .navlinks a::after{
+    content:""; position:absolute; left:0; bottom:0; height:2px; width:0;
+    background:var(--ink); transition:width .25s ease;
+  }
+  .navlinks a:hover, .navlinks a.active{ color:var(--ink); }
+  .navlinks a.active::after, .navlinks a:hover::after{ width:100%; }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding-top:calc(var(--nav-h) + clamp(48px,8vw,90px));
+    overflow:hidden;
+  }
+  .blob{
+    position:absolute; border-radius:50%; filter:blur(2px); opacity:.55;
+    animation: drift 16s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .blob{ animation:none; } }
+  .blob.b1{ width:260px; height:260px; background:var(--sage); top:6%; right:6%; animation-delay:0s; }
+  .blob.b2{ width:180px; height:180px; background:var(--gold); bottom:10%; right:20%; animation-delay:-4s; }
+  .blob.b3{ width:150px; height:150px; background:var(--blush); top:38%; right:-2%; animation-delay:-9s; }
+  @keyframes drift{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(-14px,18px) scale(1.06); }
+  }
+
+  .hero-inner{ position:relative; }
+  .hero h1{ font-size:clamp(3rem,10vw,6.4rem); }
+  .hero-logo{ width:min(620px,92vw); height:auto; }
+  .hero .script{
+    font-family:var(--script); font-size:clamp(1.8rem,4.5vw,2.8rem);
+    color:var(--sage); text-transform:none; display:block; margin-top:-6px;
+  }
+  .hero p.lede{
+    max-width:46ch; margin-top:22px; font-size:1.08rem; color:var(--ink-soft);
+  }
+  .hero-tags{ display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
+  .tag{
+    font-size:.78rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+    padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--paper-soft);
+  }
+  .scrollcue{
+    margin-top:56px; display:inline-flex; align-items:center; gap:10px;
+    font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; font-weight:600; color:var(--ink-soft);
+    text-decoration:none;
+  }
+  .scrollcue .arrow{ display:inline-block; animation:bob 1.8s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce){ .scrollcue .arrow{ animation:none; } }
+  @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(6px);} }
+
+  /* ---------- Reveal on scroll ---------- */
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.is-visible{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce){ .reveal{ transition:none; opacity:1; transform:none; } }
+
+  /* ---------- About ---------- */
+  #about{ background:var(--paper-soft); border-block:1px solid var(--line); }
+  .about-grid{ display:grid; grid-template-columns: 0.85fr 1.15fr; gap:clamp(28px,6vw,72px); align-items:start; }
+  @media (max-width:760px){ .about-grid{ grid-template-columns:1fr; } }
+
+  .badge-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:32px;
+  }
+  .portrait{
+    width:100%; max-width:170px; aspect-ratio:1/1; object-fit:cover;
+    border-radius:16px; margin-bottom:22px; border:1px solid var(--line);
+  }
+  .badge-card h3{ font-size:1.1rem; text-transform:none; margin-bottom:6px; }
+  .badge-list{ list-style:none; margin:18px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .badge-list li{ font-size:.92rem; color:var(--ink-soft); display:flex; gap:10px; align-items:baseline; }
+  .badge-list li::before{ content:"—"; color:var(--sage); font-weight:700; }
+
+  .about-copy h2{ font-size:clamp(2rem,5vw,3.1rem); margin-bottom:22px; }
+  .about-copy p + p{ margin-top:16px; }
+  .socials{ display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
+  .social-pill{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+    padding:9px 16px; border-radius:999px; background:var(--ink); color:var(--paper);
+    font-size:.85rem; font-weight:600; transition:transform .2s ease, background .2s ease;
+  }
+  .social-pill:hover{ background:var(--sage); transform:translateY(-2px); }
+
+  /* ---------- Art ---------- */
+  .section-head{ max-width:640px; margin-bottom:clamp(32px,6vw,56px); }
+  .section-head h2{ font-size:clamp(2.1rem,5.5vw,3.4rem); margin-bottom:14px; }
+  .section-head p{ font-size:1.02rem; }
+
+  .art-grid{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(24px,4vw,40px); }
+  @media (max-width:760px){ .art-grid{ grid-template-columns:1fr; } }
+
+  .art-card{
+    border:1px solid var(--line); border-radius:22px; overflow:hidden; background:var(--paper-soft);
+    display:flex; flex-direction:column; transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .art-card:hover{ transform:translateY(-6px); box-shadow:0 18px 36px -20px rgba(22,21,15,.35); }
+
+  .art-visual{
+    aspect-ratio:4/5; position:relative; overflow:hidden; background:var(--paper-soft);
+  }
+  .art-visual img{
+    width:100%; height:100%; object-fit:cover; transition:transform .5s ease;
+  }
+  .art-card:hover .art-visual img{ transform:scale(1.04); }
+
+  .art-body{ padding:24px 26px 28px; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .art-body h3{ font-size:1.5rem; text-transform:none; }
+  .art-blurb{ font-size:.9rem; font-style:italic; color:var(--ink-soft); }
+  .art-meta{ font-size:.85rem; color:var(--ink-soft); margin-top:6px; }
+  .art-price{ margin-top:10px; font-weight:700; font-size:1.15rem; }
+  .art-actions{ margin-top:18px; display:flex; flex-wrap:wrap; gap:10px; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 22px; border-radius:999px; font-weight:700; font-size:.85rem;
+    letter-spacing:.03em; text-transform:uppercase; text-decoration:none; cursor:pointer;
+    border:1px solid var(--ink); transition:transform .2s ease, background .2s ease, color .2s ease;
+  }
+  .btn-primary{ background:var(--ink); color:var(--paper); }
+  .btn-primary:hover{ transform:translateY(-2px); background:var(--sage); border-color:var(--sage); color:var(--ink); }
+  .btn-ghost{ background:transparent; color:var(--ink); }
+  .btn-ghost:hover{ background:var(--ink); color:var(--paper); }
+
+  .square-note{
+    margin-top:36px; padding:16px 20px; border:1px dashed var(--line); border-radius:14px;
+    font-size:.85rem; color:var(--ink-soft); display:flex; gap:10px; align-items:flex-start;
+  }
+
+  /* ---------- Contact ---------- */
+  #contact{ background:var(--ink); color:var(--paper); }
+  #contact .eyebrow{ color:var(--sage); }
+  #contact .eyebrow::before{ background:var(--sage); }
+  #contact h2{ color:var(--paper); }
+  #contact p{ color:rgba(255,255,255,.72); }
+
+  .contact-grid{ display:grid; grid-template-columns:.9fr 1.1fr; gap:clamp(28px,6vw,64px); }
+  @media (max-width:800px){ .contact-grid{ grid-template-columns:1fr; } }
+
+  .contact-side .script{ font-family:var(--script); color:var(--gold); font-size:2rem; display:block; margin-bottom:10px; }
+  .contact-list{ margin-top:28px; display:flex; flex-direction:column; gap:16px; }
+  .contact-list a{ text-decoration:none; font-weight:600; }
+  .contact-list a:hover{ color:var(--gold); }
+
+  form{ display:flex; flex-direction:column; gap:18px; }
+  .field{ display:flex; flex-direction:column; gap:8px; }
+  .field label{ font-size:.78rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.7); }
+  .field input, .field select, .field textarea{
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.28); border-radius:12px;
+    padding:13px 14px; font-family:var(--body); font-size:.95rem; color:var(--paper); outline:none;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .field input::placeholder, .field textarea::placeholder{ color:rgba(255,255,255,.4); }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-color:var(--gold); background:rgba(255,255,255,.1);
+  }
+  .field select{ appearance:none; background-image:linear-gradient(45deg, transparent 50%, var(--paper) 50%), linear-gradient(135deg, var(--paper) 50%, transparent 50%); background-position: calc(100% - 20px) center, calc(100% - 15px) center; background-size:5px 5px, 5px 5px; background-repeat:no-repeat; }
+  .row-2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:520px){ .row-2{ grid-template-columns:1fr; } }
+
+  .form-note{ font-size:.78rem; color:rgba(255,255,255,.5); }
+  .success-msg{
+    display:none; margin-top:4px; padding:14px 16px; border-radius:12px;
+    background:rgba(143,180,122,.16); border:1px solid var(--sage); color:var(--paper); font-size:.9rem;
+  }
+  .success-msg.show{ display:block; }
+
+  /* ---------- Footer ---------- */
+  footer{
+    padding:30px 20px; text-align:center; font-size:.8rem; color:var(--ink-soft);
+    background:var(--paper); border-top:1px solid var(--line);
+  }
+  footer a{ text-decoration:none; font-weight:600; }
+  footer a:hover{ color:var(--sage); }
+  .foot-inner{ max-width:1100px; margin-inline:auto; display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center; justify-content:space-between; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="#home" class="brand"><img class="brand-logo" src="images/logo-mark.png" alt="Luke Watson Art & Design"></a>
+    <ul class="navlinks">
+      <li><a href="#home" data-nav="home">Home</a></li>
+      <li><a href="#about" data-nav="about">About</a></li>
+      <li><a href="#art" data-nav="art">Art</a></li>
+      <li><a href="#contact" data-nav="contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section id="home" class="hero">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="wrap hero-inner">
+    <p class="eyebrow">Lubbock, Texas</p>
+    <h1 class="sr-only">Luke Watson Art &amp; Design</h1>
+    <img class="hero-logo" src="images/logo-full.png" alt="Luke Watson Art & Design">
+    <p class="lede">Artist and graphic designer working out of Lubbock, TX — bold linework wildlife paintings, clean design work, and a genuinely happy camper.</p>
+    <div class="hero-tags">
+      <span class="tag">Original Paintings</span>
+      <span class="tag">Graphic Design</span>
+      <span class="tag">Texas Tech Alumnus</span>
+    </div>
+    <a href="#art" class="scrollcue">See the work <span class="arrow">↓</span></a>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about-grid">
+    <div class="badge-card reveal">
+      <img class="portrait" src="images/luke-portrait.webp" alt="Portrait of Luke Watson">
+      <h3>Luke Watson</h3>
+      <p style="font-size:.9rem;">Est. 1992 · Lubbock, TX</p>
+      <ul class="badge-list">
+        <li>Texas Tech University alumnus</li>
+        <li>Artist &amp; graphic designer</li>
+        <li>Certified happy camper</li>
+      </ul>
+    </div>
+    <div class="about-copy">
+      <p class="eyebrow reveal">About Luke</p>
+      <h2 class="reveal">Two practices, one instinct</h2>
+      <p class="reveal" style="margin-top:22px;">Luke Watson is a Lubbock, Texas–based artist and graphic designer — two practices that come back to the same instinct: build a clear, honest image, then push it until it's fun to look at.</p>
+      <p class="reveal">A Texas Tech University alumnus, Luke brings a designer's eye to everything he makes. In the studio, he hand-renders wildlife and West Texas scenery in bold black-and-white linework, set against loose, colorful backgrounds that feel more spray can than still life.</p>
+      <p class="reveal">Call him a happy camper — that outdoor-first, low-key attitude runs through everything he makes, whether it's a brand for a client or a bear standing tall in a field of color. If it doesn't feel a little alive, it's not done yet.</p>
+      <div class="socials reveal">
+        <a class="social-pill" href="https://instagram.com/luke_rwatson" target="_blank" rel="noopener">@luke_rwatson</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="art">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Original Works</p>
+      <h2>Fresh off the easel</h2>
+      <p>Hand-painted, black-and-white linework wildlife set against loose, colorful backgrounds. Originals are one of one — reach out below for pricing and availability.</p>
+    </div>
+    <div class="art-grid">
+      <article class="art-card reveal">
+        <div class="art-visual">
+          <img src="images/mountain-lion.jpg" alt="Original painting of a mountain lion by Luke Watson, black and white linework over a colorful swirl background" loading="lazy">
+        </div>
+        <div class="art-body">
+          <h3>Mountain Lion</h3>
+          <p class="art-blurb">Local apex predator, part-time hand model. Has strong opinions about personal space and zero interest in your dog.</p>
+          <p class="art-meta">Original — 2' × 3' canvas · ink &amp; acrylic</p>
+          <p class="art-price">$120</p>
+          <div class="art-actions">
+            <a href="#" class="btn btn-primary dead-link" onclick="return false;">Purchase Now</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="art-card reveal">
+        <div class="art-visual">
+          <img src="images/black-bear.jpg" alt="Original painting of a black bear standing upright by Luke Watson, black and white linework over a colorful swirl background" loading="lazy">
+        </div>
+        <div class="art-body">
+          <h3>Black Bear</h3>
+          <p class="art-blurb">Professional two-legged stander and connoisseur of loose berries. Will not fit through your front door, no matter how badly you want him to.</p>
+          <p class="art-meta">Original — 2' × 3' canvas · ink &amp; acrylic</p>
+          <p class="art-price">$120</p>
+          <div class="art-actions">
+            <a href="#" class="btn btn-primary dead-link" onclick="return false;">Purchase Now</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="square-note reveal">
+      <span>🔒</span>
+      <span>Temporary pricing shown for testing. <strong>Purchase Now</strong> is a placeholder (it goes nowhere yet) until real checkout is wired up through Square.</span>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap contact-grid">
+    <div class="contact-side reveal">
+      <p class="eyebrow">Get in touch</p>
+      <h2>Let's make<span class="script">something good</span></h2>
+      <p style="margin-top:18px;">Commission a piece, order a print, book Luke for a project, or just say hi — fill out the form and he'll get back to you.</p>
+      <div class="contact-list">
+        <a href="https://instagram.com/luke_rwatson" target="_blank" rel="noopener">@luke_rwatson ↗</a>
+      </div>
+    </div>
+
+    <form id="contact-form" class="reveal" data-form-endpoint="" novalidate>
+      <div class="row-2">
+        <div class="field">
+          <label for="cf-name">Name</label>
+          <input id="cf-name" name="name" type="text" placeholder="Jane Doe" required>
+        </div>
+        <div class="field">
+          <label for="cf-phone">Phone</label>
+          <input id="cf-phone" name="phone" type="tel" placeholder="(806) 555-0123">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="cf-email">Email</label>
+        <input id="cf-email" name="email" type="email" placeholder="jane@email.com" required>
+      </div>
+
+      <div class="field">
+        <label for="cf-reason">How can Luke help you?</label>
+        <select id="cf-reason" name="reason" required>
+          <option value="" disabled selected>Select one</option>
+          <option>General Contact</option>
+          <option>Order Information</option>
+          <option>Book Luke or Collaborate</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="cf-source">How did you hear about Luke?</label>
+        <select id="cf-source" name="source" required>
+          <option value="" disabled selected>Select one</option>
+          <option>Social Media</option>
+          <option>Art Show</option>
+          <option>Online</option>
+          <option>Word of Mouth</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="cf-message">Anything else? (optional)</label>
+        <textarea id="cf-message" name="message" rows="4" placeholder="Tell Luke a bit more..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="align-self:flex-start; background:var(--gold); border-color:var(--gold); color:var(--ink);">Send it over</button>
+      <p class="form-note">This form isn't connected to an inbox yet — hook it up to Formspree, Squarespace, or another form backend before launch.</p>
+      <div class="success-msg" id="cf-success">Thanks — Luke will get back to you soon.</div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-inner">
+    <span>© <span id="year"></span> Luke Watson Art &amp; Design</span>
+    <span><a href="https://instagram.com/luke_rwatson" target="_blank" rel="noopener">@luke_rwatson</a></span>
+    <a href="#home">Back to top ↑</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  try{
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+
+    revealEls.forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if(r.top < window.innerHeight && r.bottom > 0){ el.classList.add('is-visible'); }
+    });
+
+    if(!prefersReduced && 'IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){ entry.target.classList.add('is-visible'); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.15 });
+      revealEls.forEach(function(el){ if(!el.classList.contains('is-visible')) io.observe(el); });
+    } else {
+      revealEls.forEach(function(el){ el.classList.add('is-visible'); });
+    }
+
+    setTimeout(function(){ revealEls.forEach(function(el){ el.classList.add('is-visible'); }); }, 2500);
+
+    var sections = ['home','about','art','contact'].map(function(id){ return document.getElementById(id); });
+    var navLinks = Array.prototype.slice.call(document.querySelectorAll('.navlinks a'));
+    if('IntersectionObserver' in window){
+      var navIo = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            navLinks.forEach(function(a){ a.classList.toggle('active', a.dataset.nav === entry.target.id); });
+          }
+        });
+      }, { threshold: 0.5 });
+      sections.forEach(function(s){ if(s) navIo.observe(s); });
+    }
+
+    var form = document.getElementById('contact-form');
+    var success = document.getElementById('cf-success');
+    if(form){
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        if(!form.checkValidity()){ form.reportValidity(); return; }
+        var endpoint = form.dataset.formEndpoint;
+        if(endpoint){
+          fetch(endpoint, { method:'POST', body:new FormData(form), headers:{ 'Accept':'application/json' } })
+            .then(function(){ success.classList.add('show'); form.reset(); })
+            .catch(function(){ success.textContent = 'Could not send — please email directly for now.'; success.classList.add('show'); });
+        } else {
+          success.classList.add('show');
+          form.reset();
+        }
+      });
+    }
+
+  }catch(err){
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('is-visible'); });
+  }
+})();
+</script>
+</body>
+</html>
