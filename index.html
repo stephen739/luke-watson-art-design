@@ -88,14 +88,15 @@
     padding-top:calc(var(--nav-h) + clamp(48px,8vw,90px));
     overflow:hidden;
   }
-  .blob{
-    position:absolute; border-radius:50%; filter:blur(2px); opacity:.55;
+  .splat{
+    position:absolute; height:auto; pointer-events:none; user-select:none;
     animation: drift 16s ease-in-out infinite;
   }
-  @media (prefers-reduced-motion: reduce){ .blob{ animation:none; } }
-  .blob.b1{ width:260px; height:260px; background:var(--sage); top:6%; right:6%; animation-delay:0s; }
-  .blob.b2{ width:180px; height:180px; background:var(--gold); bottom:10%; right:20%; animation-delay:-4s; }
-  .blob.b3{ width:150px; height:150px; background:var(--blush); top:38%; right:-2%; animation-delay:-9s; }
+  @media (prefers-reduced-motion: reduce){ .splat{ animation:none; } }
+  .splat.s1{ width:clamp(150px,26vw,300px); top:4%; right:12%; animation-delay:0s; }
+  .splat.s2{ width:clamp(130px,22vw,260px); bottom:2%; right:24%; animation-delay:-4s; }
+  .splat.s3{ width:clamp(120px,20vw,240px); top:30%; right:-2%; animation-delay:-9s; }
+  @media (max-width:640px){ .splat{ opacity:.55; } }
   @keyframes drift{
     0%,100%{ transform:translate(0,0) scale(1); }
     50%{ transform:translate(-14px,18px) scale(1.06); }
@@ -265,9 +266,9 @@
 </header>
 
 <section id="home" class="hero">
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
+  <img class="splat s1" src="images/splat-green.png" alt="" aria-hidden="true">
+  <img class="splat s2" src="images/splat-yellow.png" alt="" aria-hidden="true">
+  <img class="splat s3" src="images/splat-blue.png" alt="" aria-hidden="true">
   <div class="wrap hero-inner">
     <p class="eyebrow">Lubbock, Texas</p>
     <h1 class="sr-only">Luke Watson Art &amp; Design</h1>
