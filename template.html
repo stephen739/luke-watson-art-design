@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Luke Watson Art &amp; Design</title>
-<meta name="description" content="Luke Watson is a Lubbock, Texas artist and graphic designer. Original wildlife paintings, graphic design, and how to get in touch.">
+<title>{{site_title}}</title>
+<meta name="description" content="{{site_description}}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@600;700&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap">
@@ -195,6 +195,9 @@
   }
   .btn-primary{ background:var(--ink); color:var(--paper); }
   .btn-primary:hover{ transform:translateY(-2px); background:var(--sage); border-color:var(--sage); color:var(--ink); }
+  .btn-sold{ background:var(--paper-soft); color:var(--ink-soft); border-color:var(--line); cursor:default; }
+  .sold-badge{ position:absolute; top:14px; left:14px; background:var(--ink); color:var(--paper); font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:6px 12px; border-radius:999px; }
+  .art-empty{ grid-column:1/-1; padding:40px 0; color:var(--ink-soft); }
   .btn-ghost{ background:transparent; color:var(--ink); }
   .btn-ghost:hover{ background:var(--ink); color:var(--paper); }
 
@@ -270,15 +273,11 @@
   <img class="splat s2" src="images/splat-yellow.png" alt="" aria-hidden="true">
   <img class="splat s3" src="images/splat-blue.png" alt="" aria-hidden="true">
   <div class="wrap hero-inner">
-    <p class="eyebrow">Lubbock, Texas</p>
+    <p class="eyebrow">{{hero_eyebrow}}</p>
     <h1 class="sr-only">Luke Watson Art &amp; Design</h1>
     <img class="hero-logo" src="images/logo-full.png" alt="Luke Watson Art & Design">
-    <p class="lede">Artist and graphic designer working out of Lubbock, TX — bold linework wildlife paintings, clean design work, and a genuinely happy camper.</p>
-    <div class="hero-tags">
-      <span class="tag">Original Paintings</span>
-      <span class="tag">Graphic Design</span>
-      <span class="tag">Texas Tech Alumnus</span>
-    </div>
+    <p class="lede">{{hero_lede}}</p>
+    <div class="hero-tags"><!--HERO_TAGS--></div>
     <a href="#art" class="scrollcue">See the work <span class="arrow">↓</span></a>
   </div>
 </section>
@@ -287,22 +286,16 @@
   <div class="wrap about-grid">
     <div class="badge-card reveal">
       <img class="portrait" src="images/luke-portrait.webp" alt="Portrait of Luke Watson">
-      <h3>Luke Watson</h3>
-      <p style="font-size:.9rem;">Est. 1992 · Lubbock, TX</p>
-      <ul class="badge-list">
-        <li>Texas Tech University alumnus</li>
-        <li>Artist &amp; graphic designer</li>
-        <li>Certified happy camper</li>
-      </ul>
+      <h3>{{about_name}}</h3>
+      <p style="font-size:.9rem;">{{about_since}}</p>
+      <ul class="badge-list"><!--ABOUT_BADGES--></ul>
     </div>
     <div class="about-copy">
-      <p class="eyebrow reveal">About Luke</p>
-      <h2 class="reveal">Two practices, one instinct</h2>
-      <p class="reveal" style="margin-top:22px;">Luke Watson is a Lubbock, Texas–based artist and graphic designer — two practices that come back to the same instinct: build a clear, honest image, then push it until it's fun to look at.</p>
-      <p class="reveal">A Texas Tech University alumnus, Luke brings a designer's eye to everything he makes. In the studio, he hand-renders wildlife and West Texas scenery in bold black-and-white linework, set against loose, colorful backgrounds that feel more spray can than still life.</p>
-      <p class="reveal">Call him a happy camper — that outdoor-first, low-key attitude runs through everything he makes, whether it's a brand for a client or a bear standing tall in a field of color. If it doesn't feel a little alive, it's not done yet.</p>
+      <p class="eyebrow reveal">{{about_eyebrow}}</p>
+      <h2 class="reveal">{{about_heading}}</h2>
+      <!--ABOUT_PARAGRAPHS-->
       <div class="socials reveal">
-        <a class="social-pill" href="https://instagram.com/luke_rwatson" target="_blank" rel="noopener">@luke_rwatson</a>
+        <a class="social-pill" href="{{instagram_url}}" target="_blank" rel="noopener">{{instagram_handle}}</a>
       </div>
     </div>
   </div>
@@ -311,57 +304,24 @@
 <section id="art">
   <div class="wrap">
     <div class="section-head reveal">
-      <p class="eyebrow">Original Works</p>
-      <h2>Fresh off the easel</h2>
-      <p>Hand-painted, black-and-white linework wildlife set against loose, colorful backgrounds. Originals are one of one — reach out below for pricing and availability.</p>
+      <p class="eyebrow">{{art_eyebrow}}</p>
+      <h2>{{art_heading}}</h2>
+      <p>{{art_intro}}</p>
     </div>
-    <div class="art-grid">
-      <article class="art-card reveal">
-        <div class="art-visual">
-          <img src="images/mountain-lion.jpg" alt="Original painting of a mountain lion by Luke Watson, black and white linework over a colorful swirl background" loading="lazy">
-        </div>
-        <div class="art-body">
-          <h3>Mountain Lion</h3>
-          <p class="art-blurb">Local apex predator, part-time hand model. Has strong opinions about personal space and zero interest in your dog.</p>
-          <p class="art-meta">Original — 2' × 3' canvas · ink &amp; acrylic</p>
-          <p class="art-price">$120</p>
-          <div class="art-actions">
-            <a href="#" class="btn btn-primary dead-link" onclick="return false;">Purchase Now</a>
-          </div>
-        </div>
-      </article>
+    <div class="art-grid"><!--ARTWORKS--></div>
 
-      <article class="art-card reveal">
-        <div class="art-visual">
-          <img src="images/black-bear.jpg" alt="Original painting of a black bear standing upright by Luke Watson, black and white linework over a colorful swirl background" loading="lazy">
-        </div>
-        <div class="art-body">
-          <h3>Black Bear</h3>
-          <p class="art-blurb">Professional two-legged stander and connoisseur of loose berries. Will not fit through your front door, no matter how badly you want him to.</p>
-          <p class="art-meta">Original — 2' × 3' canvas · ink &amp; acrylic</p>
-          <p class="art-price">$120</p>
-          <div class="art-actions">
-            <a href="#" class="btn btn-primary dead-link" onclick="return false;">Purchase Now</a>
-          </div>
-        </div>
-      </article>
-    </div>
-
-    <div class="square-note reveal">
-      <span>🔒</span>
-      <span>Temporary pricing shown for testing. <strong>Purchase Now</strong> is a placeholder (it goes nowhere yet) until real checkout is wired up through Square.</span>
-    </div>
+    <!--NOTE-->
   </div>
 </section>
 
 <section id="contact">
   <div class="wrap contact-grid">
     <div class="contact-side reveal">
-      <p class="eyebrow">Get in touch</p>
-      <h2>Let's make<span class="script">something good</span></h2>
-      <p style="margin-top:18px;">Commission a piece, order a print, book Luke for a project, or just say hi — fill out the form and he'll get back to you.</p>
+      <p class="eyebrow">{{contact_eyebrow}}</p>
+      <h2>{{contact_heading_top}}<span class="script">{{contact_heading_script}}</span></h2>
+      <p style="margin-top:18px;">{{contact_intro}}</p>
       <div class="contact-list">
-        <a href="https://instagram.com/luke_rwatson" target="_blank" rel="noopener">@luke_rwatson ↗</a>
+        <a href="{{instagram_url}}" target="_blank" rel="noopener">{{instagram_handle}} ↗</a>
       </div>
     </div>
 
@@ -417,8 +377,8 @@
 
 <footer>
   <div class="foot-inner">
-    <span>© <span id="year"></span> Luke Watson Art &amp; Design</span>
-    <span><a href="https://instagram.com/luke_rwatson" target="_blank" rel="noopener">@luke_rwatson</a></span>
+    <span>© <span id="year"></span> {{footer_text}}</span>
+    <span><a href="{{instagram_url}}" target="_blank" rel="noopener">{{instagram_handle}}</a></span>
     <a href="#home">Back to top ↑</a>
   </div>
 </footer>

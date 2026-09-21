@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Site Portal · Luke Watson Art &amp; Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --paper:#FFFFFF; --soft:#F4F4F2; --ink:#16150F; --ink-soft:#514E42;
+    --sage:#8FB47A; --gold:#EFBB3E; --danger:#B3261E; --line:rgba(22,21,15,.16);
+    --display:"Anton","Arial Narrow",sans-serif; --body:"Work Sans","Helvetica Neue",Arial,sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  [hidden]{ display:none !important; }
+  body{ margin:0; background:var(--soft); color:var(--ink); font-family:var(--body); -webkit-font-smoothing:antialiased; }
+  h1,h2,h3{ font-family:var(--display); text-transform:uppercase; letter-spacing:.01em; margin:0; line-height:1.05; font-weight:400; }
+  p{ margin:0; line-height:1.55; color:var(--ink-soft); }
+  button,input,textarea,select{ font:inherit; color:inherit; }
+  :focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 20px; border-radius:999px; border:1px solid var(--ink); background:var(--paper); font-weight:700; font-size:.82rem; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; text-decoration:none; color:var(--ink); }
+  .btn:hover{ background:var(--ink); color:var(--paper); }
+  .btn-primary{ background:var(--ink); color:var(--paper); }
+  .btn-primary:hover{ background:var(--sage); border-color:var(--sage); color:var(--ink); }
+  .btn-small{ padding:7px 14px; font-size:.74rem; }
+  .btn-danger{ border-color:var(--danger); color:var(--danger); }
+  .btn-danger:hover{ background:var(--danger); color:#fff; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn:disabled:hover{ background:var(--paper); color:var(--ink); }
+  .btn-primary:disabled:hover{ background:var(--ink); color:var(--paper); }
+
+  /* login */
+  .login{ min-height:100vh; display:grid; place-items:center; padding:20px; }
+  .login-card{ width:min(420px,100%); background:var(--paper); border:1px solid var(--line); border-radius:22px; padding:36px 32px; display:flex; flex-direction:column; gap:18px; }
+  .login-card img{ height:64px; width:auto; }
+  .login-card h1{ font-size:2rem; }
+
+  /* app shell */
+  .topbar{ position:sticky; top:0; z-index:10; background:rgba(255,255,255,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .topbar-in{ max-width:960px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .topbar img{ height:34px; width:auto; }
+  .topbar .title{ font-family:var(--display); text-transform:uppercase; font-size:1.1rem; letter-spacing:.02em; }
+  .spacer{ flex:1; }
+  .tabs{ max-width:960px; margin:0 auto; padding:0 20px; display:flex; gap:6px; }
+  .tab{ border:0; background:none; padding:12px 16px; font-weight:700; font-size:.82rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; }
+  .tab[aria-selected="true"]{ color:var(--ink); border-bottom-color:var(--gold); }
+  main{ max-width:960px; margin:0 auto; padding:24px 20px 140px; display:flex; flex-direction:column; gap:20px; }
+
+  .intro{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .intro h2{ font-size:1.7rem; }
+
+  .card{ background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:20px; }
+  .art{ display:grid; grid-template-columns:150px 1fr; gap:20px; }
+  @media (max-width:640px){ .art{ grid-template-columns:1fr; } }
+  .thumb{ width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:12px; background:var(--soft); border:1px solid var(--line); display:block; }
+  .thumb-empty{ display:grid; place-items:center; text-align:center; padding:10px; font-size:.8rem; color:var(--ink-soft); }
+  .thumb-col{ display:flex; flex-direction:column; gap:10px; }
+  .fields{ display:grid; grid-template-columns:1fr 1fr; gap:14px; align-content:start; }
+  .fields .wide{ grid-column:1/-1; }
+  @media (max-width:640px){ .fields{ grid-template-columns:1fr; } }
+  label{ display:flex; flex-direction:column; gap:6px; font-size:.74rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft); }
+  label small{ font-weight:400; letter-spacing:0; text-transform:none; font-size:.78rem; color:var(--ink-soft); }
+  input[type=text],input[type=password],input[type=url],textarea{ width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:var(--paper); font-size:.95rem; letter-spacing:0; text-transform:none; font-weight:400; color:var(--ink); }
+  textarea{ resize:vertical; min-height:84px; line-height:1.5; }
+  .check{ flex-direction:row; align-items:center; gap:10px; text-transform:none; letter-spacing:0; font-size:.95rem; font-weight:600; color:var(--ink); }
+  .check input{ width:20px; height:20px; accent-color:var(--ink); }
+  .row-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+  .new-flag{ display:inline-block; background:var(--gold); color:var(--ink); font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:3px 10px; border-radius:999px; margin-bottom:8px; }
+
+  .group{ display:flex; flex-direction:column; gap:14px; }
+  .group h3{ font-size:1.25rem; }
+  .group .fields{ grid-template-columns:1fr; }
+
+  /* save bar */
+  .savebar{ position:fixed; left:0; right:0; bottom:0; background:var(--paper); border-top:1px solid var(--line); z-index:20; padding-bottom:env(safe-area-inset-bottom,0px); }
+  .savebar-in{ max-width:960px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .status{ flex:1; min-width:180px; font-size:.9rem; color:var(--ink-soft); }
+  .status.ok{ color:#2C6B1F; font-weight:600; }
+  .status.err{ color:var(--danger); font-weight:600; }
+  .err-text{ color:var(--danger); font-size:.9rem; font-weight:600; }
+  .help{ font-size:.85rem; }
+</style>
+</head>
+<body>
+
+<div id="loading" class="login"><p>Loading…</p></div>
+
+<div id="login" class="login" hidden>
+  <form class="login-card" id="login-form">
+    <img src="/images/logo-full.png" alt="Luke Watson Art & Design">
+    <h1>Site Portal</h1>
+    <p>Sign in to add new artwork and edit the words on your website.</p>
+    <label for="pw">Password
+      <input id="pw" type="password" autocomplete="current-password" required>
+    </label>
+    <p class="err-text" id="login-error" role="alert" hidden></p>
+    <button class="btn btn-primary" type="submit" id="login-btn">Sign in</button>
+  </form>
+</div>
+
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="topbar-in">
+      <img src="/images/logo-mark.png" alt="">
+      <span class="title">Site Portal</span>
+      <span class="spacer"></span>
+      <a class="btn btn-small" href="/" target="_blank" rel="noopener">View site ↗</a>
+      <button class="btn btn-small" id="logout" type="button">Sign out</button>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-art" aria-selected="true" data-tab="art">Artwork</button>
+      <button class="tab" role="tab" id="tab-text" aria-selected="false" data-tab="text">Site text</button>
+    </div>
+  </header>
+
+  <main id="main"></main>
+
+  <div class="savebar">
+    <div class="savebar-in">
+      <p class="status" id="status" role="status" aria-live="polite">No changes yet.</p>
+      <button class="btn btn-primary" id="save" type="button" disabled>Save &amp; publish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var TEXT_GROUPS = [
+    { title:'Home', fields:[
+      ['hero_eyebrow','Small line above the logo'],
+      ['hero_lede','Intro paragraph','area'],
+      ['hero_tag_1','Tag 1'],['hero_tag_2','Tag 2'],['hero_tag_3','Tag 3']
+    ]},
+    { title:'About', fields:[
+      ['about_eyebrow','Small heading'],
+      ['about_heading','Big heading'],
+      ['about_p1','Paragraph 1','area'],['about_p2','Paragraph 2','area'],['about_p3','Paragraph 3','area'],
+      ['about_name','Name on the card'],['about_since','Line under the name'],
+      ['about_badge_1','Card list item 1'],['about_badge_2','Card list item 2'],['about_badge_3','Card list item 3']
+    ]},
+    { title:'Art section', fields:[
+      ['art_eyebrow','Small heading'],
+      ['art_heading','Big heading'],
+      ['art_intro','Intro paragraph','area'],
+      ['art_note','Note under the artwork','area','Leave blank to hide this note completely.']
+    ]},
+    { title:'Contact', fields:[
+      ['contact_eyebrow','Small heading'],
+      ['contact_heading_top','Heading (first line)'],
+      ['contact_heading_script','Heading (handwritten line)'],
+      ['contact_intro','Intro paragraph','area']
+    ]},
+    { title:'Links, footer & search', fields:[
+      ['instagram_handle','Instagram name','','Shown on the site, e.g. @luke_rwatson'],
+      ['instagram_url','Instagram link','','Must start with https://'],
+      ['footer_text','Footer name (after the © year)'],
+      ['site_title','Browser tab & Google title'],
+      ['site_description','Google description','area']
+    ]}
+  ];
+
+  var state = { content:null, sha:null, dirty:false, tab:'art' };
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
+
+  function show(which){
+    ['loading','login','app'].forEach(function(id){ $(id).hidden = id !== which; });
+  }
+
+  function setStatus(msg, kind){
+    var el = $('status');
+    el.textContent = msg;
+    el.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  function markDirty(){
+    state.dirty = true;
+    $('save').disabled = false;
+    setStatus('You have unpublished changes.');
+  }
+
+  async function api(path, method, body){
+    var res = await fetch(path, {
+      method: method || 'GET',
+      credentials: 'same-origin',
+      headers: body ? { 'Content-Type':'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined
+    });
+    var data = await res.json().catch(function(){ return {}; });
+    if (res.status === 401 && path !== '/api/login') { show('login'); }
+    if (!res.ok) { var e = new Error(data.error || 'Something went wrong.'); e.status = res.status; throw e; }
+    return data;
+  }
+
+  /* ---------- rendering ---------- */
+  function render(){
+    $('tab-art').setAttribute('aria-selected', state.tab === 'art');
+    $('tab-text').setAttribute('aria-selected', state.tab === 'text');
+    $('main').innerHTML = state.tab === 'art' ? artHtml() : textHtml();
+  }
+
+  function artHtml(){
+    var list = state.content.artworks;
+    var html = '<div class="intro"><div><h2>Artwork</h2><p class="help">Pieces appear on the website in this order.</p></div>' +
+      '<button class="btn btn-primary" type="button" data-action="add">+ Add new piece</button></div>';
+    if (!list.length) html += '<div class="card"><p>No artwork yet. Click “Add new piece” to get started.</p></div>';
+    list.forEach(function(a, i){
+      html += '<section class="card art" data-id="' + esc(a.id) + '">' +
+        '<div class="thumb-col">' +
+          (a.image ? '<img class="thumb" src="' + (a._preview ? esc(a._preview) : '/' + esc(a.image)) + '" alt="">' : '<div class="thumb thumb-empty">Choose a photo</div>') +
+          '<label class="btn btn-small" style="cursor:pointer;text-align:center;">' + (a.image ? 'Change photo' : 'Choose photo') +
+            '<input type="file" accept="image/*" data-file style="display:none">' +
+          '</label>' +
+        '</div>' +
+        '<div>' +
+          (a._new ? '<span class="new-flag">New</span>' : '') +
+          '<div class="fields">' +
+            '<label class="wide">Title<input type="text" maxlength="120" data-field="title" value="' + esc(a.title) + '"></label>' +
+            '<label class="wide">Funny / short description<textarea maxlength="500" data-field="blurb">' + esc(a.blurb) + '</textarea></label>' +
+            '<label>Size &amp; materials<input type="text" maxlength="200" data-field="meta" value="' + esc(a.meta) + '" placeholder="Original — 2\' × 3\' canvas · ink &amp; acrylic"></label>' +
+            '<label>Price<input type="text" maxlength="40" data-field="price" value="' + esc(a.price) + '" placeholder="$120"></label>' +
+            '<label class="wide">Purchase link <small>Paste the Square checkout link. Until you add one, the “Purchase Now” button does nothing.</small><input type="url" maxlength="500" data-field="buyUrl" value="' + esc(a.buyUrl) + '" placeholder="https://"></label>' +
+            '<label class="check wide"><input type="checkbox" data-field="sold"' + (a.sold ? ' checked' : '') + '> Mark as sold</label>' +
+          '</div>' +
+          '<div class="row-actions">' +
+            '<button class="btn btn-small" type="button" data-action="up"' + (i === 0 ? ' disabled' : '') + '>↑ Move up</button>' +
+            '<button class="btn btn-small" type="button" data-action="down"' + (i === list.length - 1 ? ' disabled' : '') + '>↓ Move down</button>' +
+            '<button class="btn btn-small btn-danger" type="button" data-action="remove">Remove</button>' +
+          '</div>' +
+          '<p class="err-text" data-err hidden></p>' +
+        '</div>' +
+      '</section>';
+    });
+    return html;
+  }
+
+  function textHtml(){
+    var html = '<div class="intro"><div><h2>Site text</h2><p class="help">Edit the words on your website. Changes go live when you press Save &amp; publish.</p></div></div>';
+    TEXT_GROUPS.forEach(function(g){
+      html += '<section class="card group"><h3>' + esc(g.title) + '</h3><div class="fields">';
+      g.fields.forEach(function(f){
+        var key = f[0], label = f[1], kind = f[2], hint = f[3];
+        var val = state.content.text[key] || '';
+        html += '<label>' + esc(label) + (hint ? '<small>' + esc(hint) + '</small>' : '') +
+          (kind === 'area'
+            ? '<textarea data-text="' + key + '">' + esc(val) + '</textarea>'
+            : '<input type="text" data-text="' + key + '" value="' + esc(val) + '">') + '</label>';
+      });
+      html += '</div></section>';
+    });
+    return html;
+  }
+
+  /* ---------- image handling ---------- */
+  function compress(file){
+    return new Promise(function(resolve, reject){
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function(){
+        var max = 1600, w = img.naturalWidth, h = img.naturalHeight, s = Math.min(1, max / Math.max(w, h));
+        var c = document.createElement('canvas');
+        c.width = Math.round(w * s); c.height = Math.round(h * s);
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(function(blob){
+          if (!blob) { URL.revokeObjectURL(url); return reject(new Error('Could not process that image.')); }
+          var r = new FileReader();
+          r.onload = function(){ resolve({ data:String(r.result).split(',')[1], preview:URL.createObjectURL(blob) }); URL.revokeObjectURL(url); };
+          r.readAsDataURL(blob);
+        }, 'image/jpeg', 0.86);
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error("That photo couldn't be read. Try a JPG or PNG.")); };
+      img.src = url;
+    });
+  }
+
+  async function handleFile(art, file, card){
+    var err = card.querySelector('[data-err]');
+    err.hidden = true;
+    setStatus('Uploading photo…');
+    try {
+      var out = await compress(file);
+      var res = await api('/api/upload', 'POST', { name:file.name, data:out.data });
+      art.image = res.path;
+      art._preview = out.preview;
+      markDirty();
+      render();
+    } catch (e) {
+      err.textContent = e.message; err.hidden = false;
+      setStatus(e.message, 'err');
+    }
+  }
+
+  /* ---------- events ---------- */
+  function findArt(el){
+    var card = el.closest('[data-id]');
+    if (!card) return null;
+    return { card:card, art:state.content.artworks.find(function(a){ return a.id === card.dataset.id; }) };
+  }
+
+  $('main').addEventListener('input', function(e){
+    var t = e.target;
+    if (t.dataset.text) { state.content.text[t.dataset.text] = t.value; markDirty(); return; }
+    if (t.dataset.field) {
+      var f = findArt(t); if (!f) return;
+      f.art[t.dataset.field] = t.type === 'checkbox' ? t.checked : t.value;
+      markDirty();
+    }
+  });
+
+  $('main').addEventListener('change', function(e){
+    if (!e.target.matches('[data-file]') || !e.target.files[0]) return;
+    var f = findArt(e.target);
+    if (f) handleFile(f.art, e.target.files[0], f.card);
+  });
+
+  $('main').addEventListener('click', function(e){
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    var list = state.content.artworks, action = btn.dataset.action;
+    if (action === 'add') {
+      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', price:'', image:'', buyUrl:'', sold:false, _new:true });
+      markDirty(); render();
+      var first = document.querySelector('[data-field="title"]'); if (first) first.focus();
+      return;
+    }
+    var f = findArt(btn); if (!f) return;
+    var i = list.indexOf(f.art);
+    if (action === 'up' && i > 0) { list.splice(i - 1, 0, list.splice(i, 1)[0]); }
+    if (action === 'down' && i < list.length - 1) { list.splice(i + 1, 0, list.splice(i, 1)[0]); }
+    if (action === 'remove') {
+      if (!confirm('Remove "' + (f.art.title || 'this piece') + '" from the website?')) return;
+      list.splice(i, 1);
+    }
+    markDirty(); render();
+  });
+
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click', function(){ state.tab = t.dataset.tab; render(); });
+  });
+
+  function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'piece'; }
+
+  $('save').addEventListener('click', async function(){
+    var list = state.content.artworks;
+    for (var i = 0; i < list.length; i++) {
+      if (!list[i].title.trim()) { state.tab = 'art'; render(); setStatus('Every piece needs a title.', 'err'); return; }
+      if (!list[i].image) { state.tab = 'art'; render(); setStatus('"' + list[i].title + '" needs a photo.', 'err'); return; }
+    }
+    var used = {};
+    var payload = {
+      text: state.content.text,
+      artworks: list.map(function(a){
+        var id = a.id;
+        if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
+        while (used[id]) id += 'x';
+        used[id] = true;
+        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, price:a.price, image:a.image, buyUrl:a.buyUrl, sold:a.sold };
+      })
+    };
+    $('save').disabled = true;
+    setStatus('Publishing…');
+    try {
+      var res = await api('/api/content', 'POST', { content:payload, sha:state.sha });
+      state.sha = res.sha;
+      state.content = res.content;
+      state.dirty = false;
+      render();
+      setStatus('Published! Your changes will be live on the website in about a minute.', 'ok');
+    } catch (e) {
+      $('save').disabled = false;
+      setStatus(e.message, 'err');
+    }
+  });
+
+  $('logout').addEventListener('click', async function(){
+    try { await api('/api/logout', 'POST', {}); } catch (e) {}
+    location.reload();
+  });
+
+  $('login-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var err = $('login-error'); err.hidden = true;
+    $('login-btn').disabled = true;
+    try {
+      await api('/api/login', 'POST', { password:$('pw').value });
+      await load();
+    } catch (ex) {
+      err.textContent = ex.message; err.hidden = false;
+    }
+    $('login-btn').disabled = false;
+  });
+
+  window.addEventListener('beforeunload', function(e){
+    if (state.dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  async function load(){
+    try {
+      var res = await api('/api/content');
+      state.content = res.content; state.sha = res.sha; state.dirty = false;
+      $('save').disabled = true;
+      setStatus('No changes yet.');
+      render(); show('app');
+    } catch (e) {
+      if (e.status === 401) { show('login'); }
+      else { show('login'); var err = $('login-error'); err.textContent = e.message; err.hidden = false; }
+    }
+  }
+
+  (async function init(){
+    try {
+      var s = await api('/api/session');
+      if (s.authed) { await load(); } else { show('login'); }
+    } catch (e) {
+      show('login');
+      var err = $('login-error'); err.textContent = e.message; err.hidden = false;
+    }
+  })();
+})();
+</script>
+</body>
+</html>
