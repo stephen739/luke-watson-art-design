@@ -166,11 +166,6 @@
       ['art_intro','Intro paragraph','area'],
       ['art_note','Note under the artwork','area','Leave blank to hide this note completely.']
     ]},
-    { title:'Purchase options', fields:[
-      ['canvas_price','Original Canvas price','','Shown on every piece. Each piece can still have its own canvas purchase link, set on the Artwork tab.'],
-      ['print_price','Print price'],
-      ['digital_price','Digital Download price']
-    ]},
     { title:'Contact', fields:[
       ['contact_eyebrow','Small heading'],
       ['contact_heading_top','Heading (first line)'],
@@ -243,8 +238,11 @@
           '<div class="fields">' +
             '<label class="wide">Title<input type="text" maxlength="120" data-field="title" value="' + esc(a.title) + '"></label>' +
             '<label class="wide">Funny / short description<textarea maxlength="500" data-field="blurb">' + esc(a.blurb) + '</textarea></label>' +
-            '<label>Size &amp; materials<input type="text" maxlength="200" data-field="meta" value="' + esc(a.meta) + '" placeholder="Original — 2\' × 3\' canvas · ink &amp; acrylic"></label>' +
-            '<label class="wide">Original canvas purchase link <small>Paste the Square checkout link for this one-of-one canvas. Until you add one, its “Purchase” button does nothing. Print and Digital Download use the shared prices below and aren\'t linked yet.</small><input type="url" maxlength="500" data-field="buyUrl" value="' + esc(a.buyUrl) + '" placeholder="https://"></label>' +
+            '<label>Size &amp; materials<input type="text" maxlength="200" data-field="meta" value="' + esc(a.meta) + '" placeholder="Original — 18&quot; x 24&quot; canvas · ink &amp; acrylic"></label>' +
+            '<label>Canvas price<input type="text" maxlength="20" data-field="canvasPrice" value="' + esc(a.canvasPrice) + '" placeholder="$350"></label>' +
+            '<label>Print price<input type="text" maxlength="20" data-field="printPrice" value="' + esc(a.printPrice) + '" placeholder="$35"></label>' +
+            '<label>Digital Download price<input type="text" maxlength="20" data-field="digitalPrice" value="' + esc(a.digitalPrice) + '" placeholder="$15"></label>' +
+            '<label class="wide">Original canvas purchase link <small>Paste the Square checkout link for this one-of-one canvas. Until you add one, its “Purchase” button does nothing. Print and Digital Download aren\'t linked yet either.</small><input type="url" maxlength="500" data-field="buyUrl" value="' + esc(a.buyUrl) + '" placeholder="https://"></label>' +
             '<label class="check wide"><input type="checkbox" data-field="sold"' + (a.sold ? ' checked' : '') + '> Mark as sold</label>' +
             '<div class="wide">' +
               '<span class="photos-label">Photos <small style="text-transform:none;letter-spacing:0;font-weight:400;">The first photo is the cover shown on the site. Visitors can click through the rest.</small></span>' +
@@ -372,7 +370,7 @@
     if (!btn) return;
     var list = state.content.artworks, action = btn.dataset.action;
     if (action === 'add') {
-      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', images:[], buyUrl:'', sold:false, _new:true });
+      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', canvasPrice:'', printPrice:'', digitalPrice:'', images:[], buyUrl:'', sold:false, _new:true });
       markDirty(); render();
       var first = document.querySelector('[data-field="title"]'); if (first) first.focus();
       return;
@@ -411,6 +409,7 @@
     for (var i = 0; i < list.length; i++) {
       if (!list[i].title.trim()) { state.tab = 'art'; render(); setStatus('Every piece needs a title.', 'err'); return; }
       if (!list[i].images.length) { state.tab = 'art'; render(); setStatus('"' + list[i].title + '" needs at least one photo.', 'err'); return; }
+      if (!list[i].canvasPrice.trim() || !list[i].printPrice.trim() || !list[i].digitalPrice.trim()) { state.tab = 'art'; render(); setStatus('"' + list[i].title + '" needs all three prices (canvas, print, digital).', 'err'); return; }
     }
     var used = {};
     var payload = {
@@ -420,7 +419,7 @@
         if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
         while (used[id]) id += 'x';
         used[id] = true;
-        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, images:a.images, buyUrl:a.buyUrl, sold:a.sold };
+        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, canvasPrice:a.canvasPrice, printPrice:a.printPrice, digitalPrice:a.digitalPrice, images:a.images, buyUrl:a.buyUrl, sold:a.sold };
       })
     };
     $('save').disabled = true;

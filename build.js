@@ -28,11 +28,11 @@ function optionRow(label, price, opts) {
           </div>`;
 }
 
-function renderArtwork(a, t) {
+function renderArtwork(a) {
   const options = [
-    optionRow('Original Canvas', t.canvas_price, { sold: a.sold, buyUrl: a.buyUrl }),
-    optionRow('Print', t.print_price, { qtyId: `qty-${a.id}-print` }),
-    optionRow('Digital Download', t.digital_price, {}),
+    optionRow('Original Canvas', a.canvasPrice, { sold: a.sold, buyUrl: a.buyUrl }),
+    optionRow('Print', a.printPrice, { qtyId: `qty-${a.id}-print` }),
+    optionRow('Digital Download', a.digitalPrice, {}),
   ].join('');
   const multi = a.images.length > 1;
   const nav = multi
@@ -66,7 +66,7 @@ const blocks = {
     .map((x, i) => `<p class="reveal"${i === 0 ? ' style="margin-top:22px;"' : ''}>${esc(x)}</p>`)
     .join('\n      '),
   '<!--ARTWORKS-->': content.artworks.length
-    ? content.artworks.map((a) => renderArtwork(a, t)).join('\n')
+    ? content.artworks.map(renderArtwork).join('\n')
     : '<p class="art-empty">New work is on the way — check back soon.</p>',
   '<!--NOTE-->': t.art_note
     ? `<div class="square-note reveal">\n      <span>🔒</span>\n      <span>${esc(t.art_note)}</span>\n    </div>`
