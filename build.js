@@ -11,9 +11,14 @@ const t = content.text;
 const MAX_QTY = 10;
 
 function optionRow({ artworkId, title, option, label, price, sold, qtyId }) {
-  const button = sold
-    ? '<span class="opt-buy opt-sold">Sold</span>'
-    : `<button type="button" class="opt-buy add-to-cart" data-artwork="${esc(artworkId)}" data-option="${esc(option)}" data-title="${esc(title)}" data-label="${esc(label)}"${qtyId ? ` data-qty-id="${esc(qtyId)}"` : ''}>Add to Cart</button>`;
+  if (sold) {
+    // Originals are one-of-one — once sold there's nothing left to add to cart for this option.
+    return `
+          <div class="art-option opt-row-sold">
+            <span class="opt-info"><span class="opt-label">${esc(label)}</span><span class="opt-price opt-price-sold">${esc(price)} <span class="sold-note">(Sold)</span></span></span>
+          </div>`;
+  }
+  const button = `<button type="button" class="opt-buy add-to-cart" data-artwork="${esc(artworkId)}" data-option="${esc(option)}" data-title="${esc(title)}" data-label="${esc(label)}"${qtyId ? ` data-qty-id="${esc(qtyId)}"` : ''}>Add to Cart</button>`;
   const qty = qtyId
     ? `<label class="opt-qty-label" for="${esc(qtyId)}"><span class="sr-only">Quantity</span>
             <select class="opt-qty" id="${esc(qtyId)}">${Array.from({ length: MAX_QTY }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('')}</select></label>`
