@@ -8,12 +8,26 @@ const dist = path.join(root, 'dist');
 const content = validateContent(JSON.parse(fs.readFileSync(path.join(root, 'content.json'), 'utf8')));
 const t = content.text;
 
-function renderArtwork(a) {
-  const button = a.sold
-    ? '<span class="btn btn-sold">Sold</span>'
-    : a.buyUrl
-      ? `<a href="${esc(a.buyUrl)}" target="_blank" rel="noopener" class="btn btn-primary">Purchase Now</a>`
-      : '<a href="#" class="btn btn-primary dead-link" onclick="return false;">Purchase Now</a>';
+function optionRow(label, price, opts) {
+  const { sold, buyUrl } = opts || {};
+  const button = sold
+    ? '<span class="opt-buy opt-sold">Sold</span>'
+    : buyUrl
+      ? `<a href="${esc(buyUrl)}" target="_blank" rel="noopener" class="opt-buy">Purchase</a>`
+      : '<a href="#" class="opt-buy dead-link" onclick="return false;">Purchase</a>';
+  return `
+          <div class="art-option">
+            <span class="opt-info"><span class="opt-label">${esc(label)}</span><span class="opt-price">${esc(price)}</span></span>
+            ${button}
+          </div>`;
+}
+
+function renderArtwork(a, t) {
+  const options = [
+    optionRow('Original Canvas', t.canvas_price, { sold: a.sold, buyUrl: a.buyUrl }),
+    optionRow('Print', t.print_price, {}),
+    optionRow('Digital Download', t.digital_price, {}),
+  ].join('');
   const multi = a.images.length > 1;
   const nav = multi
     ? `
@@ -30,9 +44,7 @@ function renderArtwork(a) {
           <h3>${esc(a.title)}</h3>
           ${a.blurb ? `<p class="art-blurb">${esc(a.blurb)}</p>` : ''}
           ${a.meta ? `<p class="art-meta">${esc(a.meta)}</p>` : ''}
-          ${a.price ? `<p class="art-price">${esc(a.price)}</p>` : ''}
-          <div class="art-actions">
-            ${button}
+          <div class="art-options">${options}
           </div>
         </div>
       </article>`;
@@ -48,7 +60,7 @@ const blocks = {
     .map((x, i) => `<p class="reveal"${i === 0 ? ' style="margin-top:22px;"' : ''}>${esc(x)}</p>`)
     .join('\n      '),
   '<!--ARTWORKS-->': content.artworks.length
-    ? content.artworks.map(renderArtwork).join('\n')
+    ? content.artworks.map((a) => renderArtwork(a, t)).join('\n')
     : '<p class="art-empty">New work is on the way — check back soon.</p>',
   '<!--NOTE-->': t.art_note
     ? `<div class="square-note reveal">\n      <span>🔒</span>\n      <span>${esc(t.art_note)}</span>\n    </div>`

@@ -220,8 +220,23 @@
   .art-body h3{ font-size:1.5rem; text-transform:none; }
   .art-blurb{ font-size:.9rem; font-style:italic; color:var(--ink-soft); }
   .art-meta{ font-size:.85rem; color:var(--ink-soft); margin-top:6px; }
-  .art-price{ margin-top:10px; font-weight:700; font-size:1.15rem; }
-  .art-actions{ margin-top:18px; display:flex; flex-wrap:wrap; gap:10px; }
+  .art-options{ margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+  .art-option{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:10px 14px; border:1px solid var(--line); border-radius:12px; background:var(--paper);
+  }
+  .opt-info{ display:flex; flex-direction:column; gap:2px; }
+  .opt-label{ font-weight:600; font-size:.85rem; }
+  .opt-price{ font-weight:700; font-size:.95rem; }
+  .opt-buy{
+    display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
+    padding:7px 16px; border-radius:999px; border:1px solid var(--ink); background:var(--ink); color:var(--paper);
+    font-weight:700; font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; text-decoration:none; cursor:pointer;
+    transition:transform .2s ease, background .2s ease, color .2s ease;
+  }
+  .opt-buy:hover{ transform:translateY(-2px); background:var(--sage); border-color:var(--sage); color:var(--ink); }
+  .opt-sold{ background:var(--paper-soft); color:var(--ink-soft); border-color:var(--line); cursor:default; }
+  .opt-sold:hover{ transform:none; background:var(--paper-soft); color:var(--ink-soft); }
 
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
@@ -231,7 +246,6 @@
   }
   .btn-primary{ background:var(--ink); color:var(--paper); }
   .btn-primary:hover{ transform:translateY(-2px); background:var(--sage); border-color:var(--sage); color:var(--ink); }
-  .btn-sold{ background:var(--paper-soft); color:var(--ink-soft); border-color:var(--line); cursor:default; }
   .sold-badge{ position:absolute; top:14px; left:14px; background:var(--ink); color:var(--paper); font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:6px 12px; border-radius:999px; }
   .art-empty{ grid-column:1/-1; padding:40px 0; color:var(--ink-soft); }
   .btn-ghost{ background:transparent; color:var(--ink); }

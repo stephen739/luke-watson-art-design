@@ -22,12 +22,15 @@
     "art_eyebrow": "Original Works",
     "art_heading": "Fresh off the easel",
     "art_intro": "Hand-painted, black-and-white linework wildlife set against loose, colorful backgrounds. Originals are one of one — reach out below for pricing and availability.",
-    "art_note": "Temporary pricing shown for testing. Purchase Now is a placeholder (it goes nowhere yet) until real checkout is wired up through Square.",
+    "art_note": "Temporary pricing shown for testing. Purchase buttons are placeholders (they go nowhere yet) until real checkout is wired up through Square.",
     "contact_eyebrow": "Get in touch",
     "contact_heading_top": "Let's make",
     "contact_heading_script": "something good",
     "contact_intro": "Commission a piece, order a print, book Luke for a project, or just say hi — fill out the form and he'll get back to you.",
-    "footer_text": "Luke Watson Art & Design"
+    "footer_text": "Luke Watson Art & Design",
+    "canvas_price": "$350",
+    "print_price": "$50",
+    "digital_price": "$15"
   },
   "artworks": [
     {
@@ -35,8 +38,10 @@
       "title": "Mountain Lion",
       "blurb": "Local apex predator, part-time hand model. Has strong opinions about personal space and zero interest in your dog.",
       "meta": "Original — 2' × 3' canvas · ink & acrylic",
-      "price": "$120",
-      "images": ["images/mountain-lion.jpg", "images/mountain-lion-2.jpg"],
+      "images": [
+        "images/mountain-lion.jpg",
+        "images/mountain-lion-2.jpg"
+      ],
       "buyUrl": "",
       "sold": false
     },
@@ -45,8 +50,10 @@
       "title": "Black Bear",
       "blurb": "Professional two-legged stander and connoisseur of loose berries. Will not fit through your front door, no matter how badly you want him to.",
       "meta": "Original — 2' × 3' canvas · ink & acrylic",
-      "price": "$120",
-      "images": ["images/black-bear.jpg", "images/black-bear-2.jpg"],
+      "images": [
+        "images/black-bear.jpg",
+        "images/black-bear-2.jpg"
+      ],
       "buyUrl": "",
       "sold": false
     },
@@ -55,8 +62,10 @@
       "title": "Blue Skull",
       "blurb": "Not a morning person. Not really an anything-o'clock person. The crown is less \"royalty\" and more \"emotional support headwear.\"",
       "meta": "Original — acrylic on canvas",
-      "price": "$120",
-      "images": ["images/blue-skull-1.jpg", "images/blue-skull-2.jpg"],
+      "images": [
+        "images/blue-skull-1.jpg",
+        "images/blue-skull-2.jpg"
+      ],
       "buyUrl": "",
       "sold": false
     },
@@ -65,8 +74,10 @@
       "title": "Agave",
       "blurb": "Spent years growing one flower stalk just to show off, then called it a career. West Texas landscaping's strong, silent type.",
       "meta": "Original — acrylic on canvas",
-      "price": "$120",
-      "images": ["images/agave-1.jpg", "images/agave-2.jpg"],
+      "images": [
+        "images/agave-1.jpg",
+        "images/agave-2.jpg"
+      ],
       "buyUrl": "",
       "sold": false
     },
@@ -75,8 +86,10 @@
       "title": "Faces",
       "blurb": "A whole room of yelling, side-eyeing, and mild-to-moderate concern. Nobody in this painting is having a normal day.",
       "meta": "Original — acrylic on canvas",
-      "price": "$120",
-      "images": ["images/faces-1.jpg", "images/faces-2.jpg"],
+      "images": [
+        "images/faces-1.jpg",
+        "images/faces-2.jpg"
+      ],
       "buyUrl": "",
       "sold": false
     }
