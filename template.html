@@ -222,12 +222,21 @@
   .art-meta{ font-size:.85rem; color:var(--ink-soft); margin-top:6px; }
   .art-options{ margin-top:14px; display:flex; flex-direction:column; gap:8px; }
   .art-option{
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
     padding:10px 14px; border:1px solid var(--line); border-radius:12px; background:var(--paper);
   }
   .opt-info{ display:flex; flex-direction:column; gap:2px; }
   .opt-label{ font-weight:600; font-size:.85rem; }
   .opt-price{ font-weight:700; font-size:.95rem; }
+  .opt-actions{ display:flex; align-items:center; gap:8px; margin-left:auto; }
+  .opt-qty-label{ display:inline-flex; }
+  .opt-qty{
+    appearance:none; padding:7px 26px 7px 12px; border-radius:999px; border:1px solid var(--line);
+    background-color:var(--paper);
+    background-image:linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%), linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+    background-position: calc(100% - 14px) center, calc(100% - 9px) center; background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+    font-size:.8rem; font-weight:600; color:var(--ink); cursor:pointer;
+  }
   .opt-buy{
     display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
     padding:7px 16px; border-radius:999px; border:1px solid var(--ink); background:var(--ink); color:var(--paper);

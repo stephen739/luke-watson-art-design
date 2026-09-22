@@ -8,24 +8,30 @@ const dist = path.join(root, 'dist');
 const content = validateContent(JSON.parse(fs.readFileSync(path.join(root, 'content.json'), 'utf8')));
 const t = content.text;
 
+const MAX_QTY = 10;
+
 function optionRow(label, price, opts) {
-  const { sold, buyUrl } = opts || {};
+  const { sold, buyUrl, qtyId } = opts || {};
   const button = sold
     ? '<span class="opt-buy opt-sold">Sold</span>'
     : buyUrl
       ? `<a href="${esc(buyUrl)}" target="_blank" rel="noopener" class="opt-buy">Purchase</a>`
       : '<a href="#" class="opt-buy dead-link" onclick="return false;">Purchase</a>';
+  const qty = qtyId
+    ? `<label class="opt-qty-label" for="${esc(qtyId)}"><span class="sr-only">Quantity</span>
+            <select class="opt-qty" id="${esc(qtyId)}">${Array.from({ length: MAX_QTY }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('')}</select></label>`
+    : '';
   return `
           <div class="art-option">
             <span class="opt-info"><span class="opt-label">${esc(label)}</span><span class="opt-price">${esc(price)}</span></span>
-            ${button}
+            <span class="opt-actions">${qty}${button}</span>
           </div>`;
 }
 
 function renderArtwork(a, t) {
   const options = [
     optionRow('Original Canvas', t.canvas_price, { sold: a.sold, buyUrl: a.buyUrl }),
-    optionRow('Print', t.print_price, {}),
+    optionRow('Print', t.print_price, { qtyId: `qty-${a.id}-print` }),
     optionRow('Digital Download', t.digital_price, {}),
   ].join('');
   const multi = a.images.length > 1;
