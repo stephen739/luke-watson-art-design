@@ -75,6 +75,24 @@
   .group h3{ font-size:1.25rem; }
   .group .fields{ grid-template-columns:1fr; }
 
+  .photos-label{ display:block; font-size:.74rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:8px; }
+  .photo-strip{ display:flex; flex-wrap:wrap; gap:10px; }
+  .photo{ position:relative; width:84px; }
+  .photo img{ width:84px; height:105px; object-fit:cover; border-radius:8px; border:1px solid var(--line); display:block; background:var(--soft); }
+  .photo-remove{
+    position:absolute; top:-7px; right:-7px; width:22px; height:22px; border-radius:50%; border:1px solid var(--danger);
+    background:#fff; color:var(--danger); font-size:.8rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .photo-order{ display:flex; justify-content:center; gap:4px; margin-top:4px; }
+  .photo-order button{ border:1px solid var(--line); background:var(--paper); border-radius:6px; font-size:.7rem; padding:2px 6px; cursor:pointer; }
+  .photo-order button:disabled{ opacity:.35; cursor:not-allowed; }
+  .photo-cover{ position:absolute; bottom:4px; left:4px; background:rgba(22,21,15,.7); color:#fff; font-size:.6rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:2px 6px; border-radius:999px; }
+  .photo-add{
+    width:84px; height:105px; border-radius:8px; border:1px dashed var(--line); background:var(--soft);
+    display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:var(--ink-soft); cursor:pointer;
+  }
+  .photo-add:hover{ border-color:var(--ink); color:var(--ink); }
+
   /* save bar */
   .savebar{ position:fixed; left:0; right:0; bottom:0; background:var(--paper); border-top:1px solid var(--line); z-index:20; padding-bottom:env(safe-area-inset-bottom,0px); }
   .savebar-in{ max-width:960px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
@@ -164,6 +182,7 @@
   ];
 
   var state = { content:null, sha:null, dirty:false, tab:'art' };
+  var previews = {}; // uploaded path -> local blob preview URL, until publish
   var $ = function(id){ return document.getElementById(id); };
   var esc = function(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
 
@@ -209,12 +228,10 @@
       '<button class="btn btn-primary" type="button" data-action="add">+ Add new piece</button></div>';
     if (!list.length) html += '<div class="card"><p>No artwork yet. Click “Add new piece” to get started.</p></div>';
     list.forEach(function(a, i){
+      var cover = a.images[0];
       html += '<section class="card art" data-id="' + esc(a.id) + '">' +
         '<div class="thumb-col">' +
-          (a.image ? '<img class="thumb" src="' + (a._preview ? esc(a._preview) : '/' + esc(a.image)) + '" alt="">' : '<div class="thumb thumb-empty">Choose a photo</div>') +
-          '<label class="btn btn-small" style="cursor:pointer;text-align:center;">' + (a.image ? 'Change photo' : 'Choose photo') +
-            '<input type="file" accept="image/*" data-file style="display:none">' +
-          '</label>' +
+          (cover ? '<img class="thumb" src="' + esc(coverSrc(cover)) + '" alt="">' : '<div class="thumb thumb-empty">Add a photo</div>') +
         '</div>' +
         '<div>' +
           (a._new ? '<span class="new-flag">New</span>' : '') +
@@ -225,17 +242,40 @@
             '<label>Price<input type="text" maxlength="40" data-field="price" value="' + esc(a.price) + '" placeholder="$120"></label>' +
             '<label class="wide">Purchase link <small>Paste the Square checkout link. Until you add one, the “Purchase Now” button does nothing.</small><input type="url" maxlength="500" data-field="buyUrl" value="' + esc(a.buyUrl) + '" placeholder="https://"></label>' +
             '<label class="check wide"><input type="checkbox" data-field="sold"' + (a.sold ? ' checked' : '') + '> Mark as sold</label>' +
+            '<div class="wide">' +
+              '<span class="photos-label">Photos <small style="text-transform:none;letter-spacing:0;font-weight:400;">The first photo is the cover shown on the site. Visitors can click through the rest.</small></span>' +
+              '<div class="photo-strip">' +
+                a.images.map(function(src, j){
+                  return '<div class="photo" data-photo="' + j + '">' +
+                    '<img src="' + esc(coverSrc(src)) + '" alt="">' +
+                    (j === 0 ? '<span class="photo-cover">Cover</span>' : '') +
+                    '<button type="button" class="photo-remove" data-action="remove-photo" title="Remove photo">✕</button>' +
+                    '<div class="photo-order">' +
+                      '<button type="button" data-action="photo-left"' + (j === 0 ? ' disabled' : '') + '>‹</button>' +
+                      '<button type="button" data-action="photo-right"' + (j === a.images.length - 1 ? ' disabled' : '') + '>›</button>' +
+                    '</div>' +
+                  '</div>';
+                }).join('') +
+                '<label class="photo-add" title="Add photos">+' +
+                  '<input type="file" accept="image/*" data-file multiple style="display:none">' +
+                '</label>' +
+              '</div>' +
+            '</div>' +
           '</div>' +
           '<div class="row-actions">' +
             '<button class="btn btn-small" type="button" data-action="up"' + (i === 0 ? ' disabled' : '') + '>↑ Move up</button>' +
             '<button class="btn btn-small" type="button" data-action="down"' + (i === list.length - 1 ? ' disabled' : '') + '>↓ Move down</button>' +
-            '<button class="btn btn-small btn-danger" type="button" data-action="remove">Remove</button>' +
+            '<button class="btn btn-small btn-danger" type="button" data-action="remove">Remove piece</button>' +
           '</div>' +
           '<p class="err-text" data-err hidden></p>' +
         '</div>' +
       '</section>';
     });
     return html;
+  }
+
+  function coverSrc(path){
+    return previews[path] || '/' + path;
   }
 
   function textHtml(){
@@ -279,21 +319,25 @@
     });
   }
 
-  async function handleFile(art, file, card){
+  async function handleFiles(art, files, card){
     var err = card.querySelector('[data-err]');
     err.hidden = true;
-    setStatus('Uploading photo…');
-    try {
-      var out = await compress(file);
-      var res = await api('/api/upload', 'POST', { name:file.name, data:out.data });
-      art.image = res.path;
-      art._preview = out.preview;
-      markDirty();
-      render();
-    } catch (e) {
-      err.textContent = e.message; err.hidden = false;
-      setStatus(e.message, 'err');
+    for (var i = 0; i < files.length; i++) {
+      setStatus('Uploading photo' + (files.length > 1 ? ' ' + (i + 1) + ' of ' + files.length : '') + '…');
+      try {
+        var out = await compress(files[i]);
+        var res = await api('/api/upload', 'POST', { name:files[i].name, data:out.data });
+        previews[res.path] = out.preview;
+        art.images.push(res.path);
+        markDirty();
+        render();
+      } catch (e) {
+        err.textContent = e.message; err.hidden = false;
+        setStatus(e.message, 'err');
+        return;
+      }
     }
+    setStatus('You have unpublished changes.');
   }
 
   /* ---------- events ---------- */
@@ -314,9 +358,9 @@
   });
 
   $('main').addEventListener('change', function(e){
-    if (!e.target.matches('[data-file]') || !e.target.files[0]) return;
+    if (!e.target.matches('[data-file]') || !e.target.files.length) return;
     var f = findArt(e.target);
-    if (f) handleFile(f.art, e.target.files[0], f.card);
+    if (f) handleFiles(f.art, e.target.files, f.card);
   });
 
   $('main').addEventListener('click', function(e){
@@ -324,11 +368,23 @@
     if (!btn) return;
     var list = state.content.artworks, action = btn.dataset.action;
     if (action === 'add') {
-      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', price:'', image:'', buyUrl:'', sold:false, _new:true });
+      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', price:'', images:[], buyUrl:'', sold:false, _new:true });
       markDirty(); render();
       var first = document.querySelector('[data-field="title"]'); if (first) first.focus();
       return;
     }
+
+    if (action === 'remove-photo' || action === 'photo-left' || action === 'photo-right') {
+      var f2 = findArt(btn); if (!f2) return;
+      var photoEl = btn.closest('[data-photo]');
+      var j = Number(photoEl.dataset.photo);
+      if (action === 'remove-photo') { f2.art.images.splice(j, 1); }
+      if (action === 'photo-left' && j > 0) { f2.art.images.splice(j - 1, 0, f2.art.images.splice(j, 1)[0]); }
+      if (action === 'photo-right' && j < f2.art.images.length - 1) { f2.art.images.splice(j + 1, 0, f2.art.images.splice(j, 1)[0]); }
+      markDirty(); render();
+      return;
+    }
+
     var f = findArt(btn); if (!f) return;
     var i = list.indexOf(f.art);
     if (action === 'up' && i > 0) { list.splice(i - 1, 0, list.splice(i, 1)[0]); }
@@ -350,7 +406,7 @@
     var list = state.content.artworks;
     for (var i = 0; i < list.length; i++) {
       if (!list[i].title.trim()) { state.tab = 'art'; render(); setStatus('Every piece needs a title.', 'err'); return; }
-      if (!list[i].image) { state.tab = 'art'; render(); setStatus('"' + list[i].title + '" needs a photo.', 'err'); return; }
+      if (!list[i].images.length) { state.tab = 'art'; render(); setStatus('"' + list[i].title + '" needs at least one photo.', 'err'); return; }
     }
     var used = {};
     var payload = {
@@ -360,7 +416,7 @@
         if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
         while (used[id]) id += 'x';
         used[id] = true;
-        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, price:a.price, image:a.image, buyUrl:a.buyUrl, sold:a.sold };
+        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, price:a.price, images:a.images, buyUrl:a.buyUrl, sold:a.sold };
       })
     };
     $('save').disabled = true;
@@ -370,6 +426,7 @@
       state.sha = res.sha;
       state.content = res.content;
       state.dirty = false;
+      previews = {};
       render();
       setStatus('Published! Your changes will be live on the website in about a minute.', 'ok');
     } catch (e) {
@@ -404,6 +461,7 @@
     try {
       var res = await api('/api/content');
       state.content = res.content; state.sha = res.sha; state.dirty = false;
+      previews = {};
       $('save').disabled = true;
       setStatus('No changes yet.');
       render(); show('app');

@@ -14,10 +14,17 @@ function renderArtwork(a) {
     : a.buyUrl
       ? `<a href="${esc(a.buyUrl)}" target="_blank" rel="noopener" class="btn btn-primary">Purchase Now</a>`
       : '<a href="#" class="btn btn-primary dead-link" onclick="return false;">Purchase Now</a>';
+  const multi = a.images.length > 1;
+  const nav = multi
+    ? `
+          <button type="button" class="art-nav prev" aria-label="Previous photo">‹</button>
+          <button type="button" class="art-nav next" aria-label="Next photo">›</button>
+          <span class="art-count" data-count>1 / ${a.images.length}</span>`
+    : '';
   return `
       <article class="art-card reveal">
-        <div class="art-visual">
-          <img src="${esc(a.image)}" alt="${esc(`Original artwork: ${a.title}`)}" loading="lazy">${a.sold ? '\n          <span class="sold-badge">Sold</span>' : ''}
+        <div class="art-visual"${multi ? ` data-images='${JSON.stringify(a.images).replace(/'/g, '&#39;')}' tabindex="0" role="button" aria-label="${esc(`View photos of ${a.title}`)}"` : ''}>
+          <img class="art-photo" src="${esc(a.images[0])}" alt="${esc(`Original artwork: ${a.title}`)}" loading="lazy">${a.sold ? '\n          <span class="sold-badge">Sold</span>' : ''}${nav}
         </div>
         <div class="art-body">
           <h3>${esc(a.title)}</h3>
