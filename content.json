@@ -39,11 +39,11 @@
         "images/mountain-lion.jpg",
         "images/mountain-lion-2.jpg"
       ],
-      "buyUrl": "",
       "sold": false,
       "canvasPrice": "$350",
       "printPrice": "$35",
-      "digitalPrice": "$15"
+      "digitalPrice": "$15",
+      "digitalFile": "digital-assets/mountain-lion.jpg"
     },
     {
       "id": "black-bear",
@@ -54,11 +54,11 @@
         "images/black-bear.jpg",
         "images/black-bear-2.jpg"
       ],
-      "buyUrl": "",
       "sold": false,
       "canvasPrice": "$350",
       "printPrice": "$35",
-      "digitalPrice": "$15"
+      "digitalPrice": "$15",
+      "digitalFile": "digital-assets/black-bear.jpg"
     },
     {
       "id": "blue-skull",
@@ -69,11 +69,11 @@
         "images/blue-skull-1.jpg",
         "images/blue-skull-2.jpg"
       ],
-      "buyUrl": "",
       "sold": false,
       "canvasPrice": "$75",
       "printPrice": "$25",
-      "digitalPrice": "$15"
+      "digitalPrice": "$15",
+      "digitalFile": "digital-assets/blue-skull.jpg"
     },
     {
       "id": "agave",
@@ -84,11 +84,11 @@
         "images/agave-1.jpg",
         "images/agave-2.jpg"
       ],
-      "buyUrl": "",
       "sold": false,
       "canvasPrice": "$75",
       "printPrice": "$25",
-      "digitalPrice": "$15"
+      "digitalPrice": "$15",
+      "digitalFile": "digital-assets/agave.jpg"
     },
     {
       "id": "faces",
@@ -99,11 +99,11 @@
         "images/faces-1.jpg",
         "images/faces-2.jpg"
       ],
-      "buyUrl": "",
       "sold": false,
       "canvasPrice": "$75",
       "printPrice": "$25",
-      "digitalPrice": "$15"
+      "digitalPrice": "$15",
+      "digitalFile": "digital-assets/faces.jpg"
     }
   ]
 }

@@ -10,13 +10,10 @@ const t = content.text;
 
 const MAX_QTY = 10;
 
-function optionRow(label, price, opts) {
-  const { sold, buyUrl, qtyId } = opts || {};
+function optionRow({ artworkId, title, option, label, price, sold, qtyId }) {
   const button = sold
     ? '<span class="opt-buy opt-sold">Sold</span>'
-    : buyUrl
-      ? `<a href="${esc(buyUrl)}" target="_blank" rel="noopener" class="opt-buy">Purchase</a>`
-      : '<a href="#" class="opt-buy dead-link" onclick="return false;">Purchase</a>';
+    : `<button type="button" class="opt-buy add-to-cart" data-artwork="${esc(artworkId)}" data-option="${esc(option)}" data-title="${esc(title)}" data-label="${esc(label)}"${qtyId ? ` data-qty-id="${esc(qtyId)}"` : ''}>Add to Cart</button>`;
   const qty = qtyId
     ? `<label class="opt-qty-label" for="${esc(qtyId)}"><span class="sr-only">Quantity</span>
             <select class="opt-qty" id="${esc(qtyId)}">${Array.from({ length: MAX_QTY }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('')}</select></label>`
@@ -30,9 +27,9 @@ function optionRow(label, price, opts) {
 
 function renderArtwork(a) {
   const options = [
-    optionRow('Original Canvas', a.canvasPrice, { sold: a.sold, buyUrl: a.buyUrl }),
-    optionRow('Print', a.printPrice, { qtyId: `qty-${a.id}-print` }),
-    optionRow('Digital Download', a.digitalPrice, {}),
+    optionRow({ artworkId: a.id, title: a.title, option: 'canvas', label: 'Original Canvas', price: a.canvasPrice, sold: a.sold }),
+    optionRow({ artworkId: a.id, title: a.title, option: 'print', label: 'Print', price: a.printPrice, qtyId: `qty-${a.id}-print` }),
+    optionRow({ artworkId: a.id, title: a.title, option: 'digital', label: 'Digital Download', price: a.digitalPrice }),
   ].join('');
   const multi = a.images.length > 1;
   const nav = multi
@@ -71,6 +68,16 @@ const blocks = {
   '<!--NOTE-->': t.art_note
     ? `<div class="square-note reveal">\n      <span>🔒</span>\n      <span>${esc(t.art_note)}</span>\n    </div>`
     : '',
+  '<!--SQUARE_CONFIG-->': (() => {
+    const environment = process.env.SQUARE_ENVIRONMENT === 'production' ? 'production' : 'sandbox';
+    const sdkUrl = environment === 'production' ? 'https://web.squarecdn.com/v1/square.js' : 'https://sandbox.web.squarecdn.com/v1/square.js';
+    const config = {
+      applicationId: process.env.SQUARE_APPLICATION_ID || '',
+      locationId: process.env.SQUARE_LOCATION_ID || '',
+      environment,
+    };
+    return `<script>window.LW_SQUARE = ${JSON.stringify(config)};</script>\n<script src="${sdkUrl}"></script>`;
+  })(),
 };
 for (const [marker, value] of Object.entries(blocks)) {
   if (!html.includes(marker)) throw new Error(`Template is missing ${marker}`);

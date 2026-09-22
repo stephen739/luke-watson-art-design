@@ -83,6 +83,16 @@
   .navlinks a:hover, .navlinks a.active{ color:var(--ink); }
   .navlinks a.active::after, .navlinks a:hover::after{ width:100%; }
 
+  .cart-toggle{
+    position:relative; border:0; background:none; cursor:pointer; padding:6px; color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cart-toggle svg{ width:24px; height:24px; }
+  .cart-count{
+    position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; padding:0 4px; border-radius:999px;
+    background:var(--gold); color:var(--ink); font-size:.68rem; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+
   /* ---------- Hero ---------- */
   .hero{
     padding-top:calc(var(--nav-h) + clamp(48px,8vw,90px));
@@ -265,6 +275,74 @@
     font-size:.85rem; color:var(--ink-soft); display:flex; gap:10px; align-items:flex-start;
   }
 
+  /* ---------- Cart drawer ---------- */
+  .cart-overlay{ position:fixed; inset:0; background:rgba(22,21,15,.5); z-index:90; }
+  .cart-overlay[hidden]{ display:none; }
+  .cart-drawer{
+    position:fixed; top:0; right:0; bottom:0; width:min(420px,100vw); background:var(--paper); z-index:95;
+    display:flex; flex-direction:column; box-shadow:-16px 0 40px -20px rgba(22,21,15,.4);
+  }
+  .cart-drawer[hidden]{ display:none; }
+  .cart-drawer-head{ display:flex; align-items:center; justify-content:space-between; padding:20px; border-bottom:1px solid var(--line); }
+  .cart-drawer-head h3{ font-size:1.3rem; text-transform:uppercase; }
+  .drawer-close{ border:0; background:none; font-size:1.1rem; cursor:pointer; color:var(--ink); padding:4px; }
+  .cart-lines{ flex:1; overflow-y:auto; padding:12px 20px; display:flex; flex-direction:column; gap:14px; }
+  .cart-lines:empty::after{ content:"Your cart is empty."; color:var(--ink-soft); display:block; padding:30px 0; text-align:center; }
+  .cart-line{ display:flex; gap:12px; align-items:flex-start; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  .cart-line img{ width:56px; height:70px; object-fit:cover; border-radius:8px; flex-shrink:0; }
+  .cart-line-info{ flex:1; display:flex; flex-direction:column; gap:2px; }
+  .cart-line-title{ font-weight:700; font-size:.9rem; }
+  .cart-line-meta{ font-size:.8rem; color:var(--ink-soft); }
+  .cart-line-price{ font-weight:700; font-size:.85rem; }
+  .cart-line-remove{ border:0; background:none; color:var(--ink-soft); cursor:pointer; font-size:.9rem; padding:2px; }
+  .cart-line-remove:hover{ color:var(--danger,#B3261E); }
+  .cart-drawer-foot{ padding:18px 20px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:10px; }
+  .cart-subtotal{ display:flex; justify-content:space-between; font-weight:700; font-size:1.05rem; margin-bottom:4px; }
+  .btn-ghost-line{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .btn-ghost-line:hover{ background:var(--paper-soft); }
+
+  .added-toast{
+    position:fixed; top:calc(var(--nav-h) + 14px); right:20px; z-index:96; background:var(--paper);
+    border:1px solid var(--line); border-radius:16px; padding:18px 20px; width:min(320px,calc(100vw - 40px));
+    box-shadow:0 18px 36px -20px rgba(22,21,15,.35);
+  }
+  .added-toast[hidden]{ display:none; }
+  .added-toast p{ font-weight:600; margin-bottom:14px; }
+  .added-toast-actions{ display:flex; flex-direction:column; gap:8px; }
+
+  /* ---------- Checkout modal (reuses .lightbox for the dark backdrop) ---------- */
+  .checkout-frame{ max-width:min(94vw,520px); }
+  .checkout-panel{
+    background:var(--paper); color:var(--ink); border-radius:16px; padding:28px;
+    max-height:86vh; overflow-y:auto;
+  }
+  #checkout-form{ display:flex; flex-direction:column; gap:16px; }
+  .checkout-panel h3{ font-size:1.5rem; text-transform:uppercase; }
+  .checkout-panel .field label{ color:var(--ink-soft); }
+  .checkout-panel .field input{
+    background:var(--paper-soft); border:1px solid var(--line); color:var(--ink);
+  }
+  .checkout-panel .field input::placeholder{ color:var(--ink-soft); }
+  .checkout-panel .field input:focus{ border-color:var(--sage); background:var(--paper); }
+  .checkout-panel .form-note{ color:var(--ink-soft); }
+  .checkout-lines{ display:flex; flex-direction:column; gap:6px; font-size:.9rem; }
+  .checkout-line-row{ display:flex; justify-content:space-between; gap:12px; }
+  .checkout-totals{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:10px 0; display:flex; flex-direction:column; gap:4px; font-size:.9rem; }
+  .checkout-totals .grand{ font-weight:700; font-size:1.05rem; }
+  .checkout-panel .check{
+    display:flex; align-items:flex-start; gap:10px; font-size:.9rem; font-weight:600; cursor:pointer; padding:4px 0;
+  }
+  .checkout-panel .check small{ font-weight:400; color:var(--ink-soft); display:block; }
+  .checkout-panel .check input{ margin-top:3px; accent-color:var(--ink); }
+  .checkout-shipping{ display:flex; flex-direction:column; gap:14px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
+  .checkout-shipping[hidden]{ display:none; }
+  #card-container{ padding:4px 0; }
+  .checkout-error{ color:#B3261E; font-size:.88rem; font-weight:600; }
+  .checkout-error[hidden]{ display:none; }
+  .checkout-success{ text-align:center; display:flex; flex-direction:column; gap:12px; align-items:center; }
+  .checkout-success[hidden]{ display:none; }
+  .checkout-success a{ font-weight:700; text-decoration:underline; }
+
   /* ---------- Contact ---------- */
   #contact{ background:var(--ink); color:var(--paper); }
   #contact .eyebrow{ color:var(--sage); }
@@ -324,6 +402,10 @@
       <li><a href="#art" data-nav="art">Art</a></li>
       <li><a href="#contact" data-nav="contact">Contact</a></li>
     </ul>
+    <button type="button" class="cart-toggle" id="cart-toggle" aria-label="Open cart">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 8h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span class="cart-count" id="cart-count" hidden>0</span>
+    </button>
   </nav>
 </header>
 
@@ -382,6 +464,86 @@
     <button type="button" class="art-nav prev" id="lightbox-prev" aria-label="Previous photo">‹</button>
     <button type="button" class="art-nav next" id="lightbox-next" aria-label="Next photo">›</button>
     <p class="lightbox-caption" id="lightbox-caption"></p>
+  </div>
+</div>
+
+<div class="cart-overlay" id="cart-overlay" hidden></div>
+
+<aside class="cart-drawer" id="cart-drawer" hidden role="dialog" aria-modal="true" aria-label="Your cart">
+  <div class="cart-drawer-head">
+    <h3>Your Cart</h3>
+    <button type="button" class="drawer-close" id="cart-close" aria-label="Close cart">✕</button>
+  </div>
+  <div class="cart-lines" id="cart-lines"></div>
+  <div class="cart-drawer-foot">
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+    <button type="button" class="btn btn-primary cart-checkout-btn" id="cart-checkout-btn">Checkout</button>
+    <button type="button" class="btn btn-ghost-line" id="cart-continue-btn">Continue Shopping</button>
+  </div>
+</aside>
+
+<div class="added-toast" id="added-toast" hidden role="status">
+  <p id="added-toast-text">Added to cart</p>
+  <div class="added-toast-actions">
+    <button type="button" class="btn btn-primary" id="added-checkout-btn">Checkout</button>
+    <button type="button" class="btn btn-ghost-line" id="added-continue-btn">Continue Shopping</button>
+  </div>
+</div>
+
+<div class="lightbox" id="checkout-modal" hidden role="dialog" aria-modal="true" aria-label="Checkout">
+  <div class="lightbox-frame checkout-frame">
+    <button type="button" class="lightbox-close" id="checkout-close" aria-label="Close">✕</button>
+    <div class="checkout-panel">
+      <div id="checkout-form">
+        <h3>Checkout</h3>
+        <div class="checkout-lines" id="checkout-lines"></div>
+        <div class="checkout-totals" id="checkout-totals"></div>
+
+        <div class="field">
+          <label for="co-name">Name</label>
+          <input id="co-name" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="co-email">Email</label>
+          <input id="co-email" type="email" autocomplete="email" required>
+        </div>
+
+        <div class="field checkout-fulfillment" id="checkout-fulfillment" hidden>
+          <label style="margin-bottom:4px;">Fulfillment</label>
+          <label class="check"><input type="radio" name="co-fulfillment" value="pickup" checked> Local Pickup — Lubbock, TX <small>(details to follow from Luke)</small></label>
+          <label class="check"><input type="radio" name="co-fulfillment" value="shipping"> Shipping <small>(+$10 flat rate)</small></label>
+          <div class="checkout-shipping" id="checkout-shipping" hidden>
+            <div class="field"><label for="co-ship-name">Full name</label><input id="co-ship-name" type="text"></div>
+            <div class="field"><label for="co-ship-line1">Address</label><input id="co-ship-line1" type="text" placeholder="Street address"></div>
+            <div class="field"><label for="co-ship-line2">Address line 2 (optional)</label><input id="co-ship-line2" type="text"></div>
+            <div class="row-2">
+              <div class="field"><label for="co-ship-city">City</label><input id="co-ship-city" type="text"></div>
+              <div class="field"><label for="co-ship-state">State</label><input id="co-ship-state" type="text"></div>
+            </div>
+            <div class="row-2">
+              <div class="field"><label for="co-ship-zip">ZIP</label><input id="co-ship-zip" type="text"></div>
+              <div class="field"><label for="co-ship-phone">Phone</label><input id="co-ship-phone" type="tel"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Card</label>
+          <div id="card-container"></div>
+        </div>
+
+        <p class="checkout-error" id="checkout-error" hidden></p>
+        <button type="button" class="btn btn-primary" id="checkout-pay-btn" style="width:100%;">Pay</button>
+        <p class="form-note" style="text-align:center;">Payments are processed securely by Square.</p>
+      </div>
+
+      <div class="checkout-success" id="checkout-success" hidden>
+        <h3>Thank you!</h3>
+        <p id="checkout-success-text"></p>
+        <div id="checkout-downloads"></div>
+        <button type="button" class="btn btn-primary" id="checkout-done-btn">Done</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -454,6 +616,7 @@
   </div>
 </footer>
 
+<!--SQUARE_CONFIG-->
 <script>
 (function(){
   try{
@@ -581,6 +744,255 @@
       if(e.key === 'Escape') closeLightbox();
       if(e.key === 'ArrowLeft') stepLightbox(-1);
       if(e.key === 'ArrowRight') stepLightbox(1);
+    });
+
+    /* ---------- Cart ---------- */
+    var CART_KEY = 'lw_cart_v1';
+    function escHtml(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function parsePrice(s){ var n = Number(String(s).replace(/[^0-9.]/g, '')); return isFinite(n) ? n : 0; }
+    function fmtMoney(n){ return '$' + n.toFixed(2); }
+
+    function loadCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch(e){ return []; } }
+    function saveCart(){ try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){} }
+    var cart = loadCart();
+
+    function cartHasPhysical(){ return cart.some(function(l){ return l.option === 'canvas' || l.option === 'print'; }); }
+    function cartSubtotal(){ return cart.reduce(function(sum, l){ return sum + parsePrice(l.price) * l.qty; }, 0); }
+
+    function addToCart(item){
+      var existing = cart.filter(function(l){ return l.artworkId === item.artworkId && l.option === item.option; })[0];
+      if(existing){
+        if(item.option === 'print'){ existing.qty = Math.min(10, existing.qty + item.qty); }
+      } else {
+        cart.push(item);
+      }
+      saveCart();
+      renderCartBadge();
+      renderCartDrawer();
+    }
+    function removeFromCart(artworkId, option){
+      cart = cart.filter(function(l){ return !(l.artworkId === artworkId && l.option === option); });
+      saveCart();
+      renderCartBadge();
+      renderCartDrawer();
+    }
+    function clearCart(){
+      cart = [];
+      saveCart();
+      renderCartBadge();
+      renderCartDrawer();
+    }
+
+    function renderCartBadge(){
+      var count = cart.reduce(function(s,l){ return s + l.qty; }, 0);
+      var el = document.getElementById('cart-count');
+      el.textContent = count;
+      el.hidden = count === 0;
+    }
+
+    function renderCartDrawer(){
+      var wrap = document.getElementById('cart-lines');
+      wrap.innerHTML = '';
+      cart.forEach(function(l){
+        var row = document.createElement('div');
+        row.className = 'cart-line';
+        row.innerHTML =
+          (l.image ? '<img src="' + escHtml(l.image) + '" alt="">' : '') +
+          '<div class="cart-line-info">' +
+            '<span class="cart-line-title">' + escHtml(l.title) + '</span>' +
+            '<span class="cart-line-meta">' + escHtml(l.label) + (l.option === 'print' ? ' × ' + l.qty : '') + '</span>' +
+            '<span class="cart-line-price">' + fmtMoney(parsePrice(l.price) * l.qty) + '</span>' +
+          '</div>' +
+          '<button type="button" class="cart-line-remove" aria-label="Remove ' + escHtml(l.title) + '">✕</button>';
+        row.querySelector('.cart-line-remove').addEventListener('click', function(){ removeFromCart(l.artworkId, l.option); });
+        wrap.appendChild(row);
+      });
+      document.getElementById('cart-subtotal').textContent = fmtMoney(cartSubtotal());
+    }
+
+    var cartOverlay = document.getElementById('cart-overlay');
+    var cartDrawer = document.getElementById('cart-drawer');
+    function openCartDrawer(){
+      renderCartDrawer();
+      cartOverlay.hidden = false;
+      cartDrawer.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeCartDrawer(){
+      cartOverlay.hidden = true;
+      cartDrawer.hidden = true;
+      if(checkoutModal.hidden) document.body.style.overflow = '';
+    }
+    document.getElementById('cart-toggle').addEventListener('click', openCartDrawer);
+    document.getElementById('cart-close').addEventListener('click', closeCartDrawer);
+    cartOverlay.addEventListener('click', closeCartDrawer);
+    document.getElementById('cart-continue-btn').addEventListener('click', closeCartDrawer);
+    document.getElementById('cart-checkout-btn').addEventListener('click', function(){ closeCartDrawer(); openCheckout(); });
+
+    var toast = document.getElementById('added-toast');
+    var toastTimer = null;
+    function showAddedToast(item){
+      document.getElementById('added-toast-text').textContent = 'Added "' + item.title + '" (' + item.label + ') to your cart.';
+      toast.hidden = false;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toast.hidden = true; }, 6000);
+    }
+    document.getElementById('added-continue-btn').addEventListener('click', function(){ toast.hidden = true; });
+    document.getElementById('added-checkout-btn').addEventListener('click', function(){ toast.hidden = true; openCheckout(); });
+
+    document.querySelectorAll('.add-to-cart').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var artworkId = btn.dataset.artwork, option = btn.dataset.option, title = btn.dataset.title, label = btn.dataset.label;
+        var priceEl = btn.closest('.art-option').querySelector('.opt-price');
+        var price = priceEl ? priceEl.textContent : '';
+        var qty = 1;
+        if(btn.dataset.qtyId){
+          var sel = document.getElementById(btn.dataset.qtyId);
+          if(sel) qty = parseInt(sel.value, 10) || 1;
+        }
+        var card = btn.closest('.art-card');
+        var img = card ? card.querySelector('.art-photo') : null;
+        var item = { artworkId: artworkId, option: option, title: title, label: label, price: price, qty: qty, image: img ? img.getAttribute('src') : '' };
+        addToCart(item);
+        showAddedToast(item);
+      });
+    });
+
+    renderCartBadge();
+
+    /* ---------- Checkout ---------- */
+    var checkoutModal = document.getElementById('checkout-modal');
+    var squarePayments = null, squareCard = null;
+
+    function renderCheckoutSummary(){
+      var linesWrap = document.getElementById('checkout-lines');
+      linesWrap.innerHTML = cart.map(function(l){
+        return '<div class="checkout-line-row"><span>' + escHtml(l.title) + ' — ' + escHtml(l.label) + (l.option === 'print' ? ' × ' + l.qty : '') + '</span><span>' + fmtMoney(parsePrice(l.price) * l.qty) + '</span></div>';
+      }).join('');
+      var subtotal = cartSubtotal();
+      var hasPhysical = cartHasPhysical();
+      document.getElementById('checkout-fulfillment').hidden = !hasPhysical;
+      var shippingChecked = hasPhysical && document.querySelector('input[name="co-fulfillment"][value="shipping"]').checked;
+      var shippingFee = shippingChecked ? 10 : 0;
+      var total = subtotal + shippingFee;
+      document.getElementById('checkout-totals').innerHTML =
+        '<div class="checkout-line-row"><span>Subtotal</span><span>' + fmtMoney(subtotal) + '</span></div>' +
+        (shippingFee ? '<div class="checkout-line-row"><span>Shipping</span><span>' + fmtMoney(shippingFee) + '</span></div>' : '') +
+        '<div class="checkout-line-row grand"><span>Total</span><span>' + fmtMoney(total) + '</span></div>';
+      document.getElementById('checkout-pay-btn').textContent = 'Pay ' + fmtMoney(total);
+    }
+
+    document.querySelectorAll('input[name="co-fulfillment"]').forEach(function(r){
+      r.addEventListener('change', function(){
+        document.getElementById('checkout-shipping').hidden = r.value !== 'shipping';
+        renderCheckoutSummary();
+      });
+    });
+
+    function ensureSquareCard(){
+      if(squareCard) return Promise.resolve(squareCard);
+      if(!window.Square || !window.LW_SQUARE || !window.LW_SQUARE.applicationId || !window.LW_SQUARE.locationId){
+        return Promise.reject(new Error('not-configured'));
+      }
+      squarePayments = window.Square.payments(window.LW_SQUARE.applicationId, window.LW_SQUARE.locationId);
+      return squarePayments.card().then(function(card){
+        return card.attach('#card-container').then(function(){ squareCard = card; return card; });
+      });
+    }
+
+    function setCheckoutError(msg){
+      var el = document.getElementById('checkout-error');
+      if(msg){ el.textContent = msg; el.hidden = false; } else { el.hidden = true; }
+    }
+
+    function openCheckout(){
+      if(!cart.length){ openCartDrawer(); return; }
+      document.getElementById('checkout-form').style.display = '';
+      document.getElementById('checkout-success').hidden = true;
+      setCheckoutError('');
+      renderCheckoutSummary();
+      checkoutModal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      var payBtn = document.getElementById('checkout-pay-btn');
+      payBtn.disabled = false;
+      ensureSquareCard().catch(function(){
+        setCheckoutError('Checkout is not set up yet. Please contact Luke directly to complete this purchase.');
+        payBtn.disabled = true;
+      });
+    }
+    function closeCheckout(){
+      checkoutModal.hidden = true;
+      if(cartDrawer.hidden) document.body.style.overflow = '';
+    }
+    document.getElementById('checkout-close').addEventListener('click', closeCheckout);
+    checkoutModal.addEventListener('click', function(e){ if(e.target === checkoutModal) closeCheckout(); });
+    document.getElementById('checkout-done-btn').addEventListener('click', closeCheckout);
+
+    document.getElementById('checkout-pay-btn').addEventListener('click', function(){
+      var payBtn = this;
+      setCheckoutError('');
+      var name = document.getElementById('co-name').value.trim();
+      var email = document.getElementById('co-email').value.trim();
+      if(!name){ setCheckoutError('Please enter your name.'); return; }
+      if(!email || email.indexOf('@') === -1){ setCheckoutError('Please enter a valid email address.'); return; }
+
+      var hasPhysical = cartHasPhysical();
+      var fulfillment = null, shipping = null;
+      if(hasPhysical){
+        fulfillment = document.querySelector('input[name="co-fulfillment"]:checked').value;
+        if(fulfillment === 'shipping'){
+          shipping = {
+            name: document.getElementById('co-ship-name').value.trim(),
+            line1: document.getElementById('co-ship-line1').value.trim(),
+            line2: document.getElementById('co-ship-line2').value.trim(),
+            city: document.getElementById('co-ship-city').value.trim(),
+            state: document.getElementById('co-ship-state').value.trim(),
+            zip: document.getElementById('co-ship-zip').value.trim(),
+            phone: document.getElementById('co-ship-phone').value.trim()
+          };
+          if(!shipping.name || !shipping.line1 || !shipping.city || !shipping.state || !shipping.zip || !shipping.phone){
+            setCheckoutError('Please fill in the full shipping address and phone number.');
+            return;
+          }
+        }
+      }
+
+      if(!squareCard){ setCheckoutError('Checkout is not set up yet. Please contact Luke directly to complete this purchase.'); return; }
+
+      payBtn.disabled = true;
+      payBtn.textContent = 'Processing…';
+
+      squareCard.tokenize().then(function(result){
+        if(result.status !== 'OK'){
+          throw new Error((result.errors && result.errors[0] && result.errors[0].message) || 'Could not process the card.');
+        }
+        var items = cart.map(function(l){ return { artworkId: l.artworkId, option: l.option, qty: l.qty }; });
+        return fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: items, fulfillment: fulfillment, shipping: shipping, buyerName: name, buyerEmail: email, nonce: result.token })
+        }).then(function(res){
+          return res.json().then(function(data){ return { ok: res.ok, data: data }; });
+        });
+      }).then(function(res){
+        if(!res.ok){ throw new Error(res.data.error || 'Something went wrong. Please try again.'); }
+        var downloads = (res.data.downloads || []).filter(function(d){ return d.url; });
+        var pending = (res.data.downloads || []).filter(function(d){ return !d.url; });
+        var text = 'A confirmation email is on its way to ' + email + '.';
+        if(pending.length){ text += ' Luke will email you the file' + (pending.length > 1 ? 's' : '') + ' for ' + pending.map(function(d){ return d.title; }).join(', ') + ' directly.'; }
+        document.getElementById('checkout-success-text').textContent = text;
+        document.getElementById('checkout-downloads').innerHTML = downloads.map(function(d){
+          return '<p><a href="' + d.url + '" download>Download ' + escHtml(d.title) + '</a></p>';
+        }).join('');
+        document.getElementById('checkout-form').style.display = 'none';
+        document.getElementById('checkout-success').hidden = false;
+        clearCart();
+      }).catch(function(err){
+        setCheckoutError(err.message || 'Something went wrong. Please try again.');
+      }).then(function(){
+        payBtn.disabled = false;
+        renderCheckoutSummary();
+      });
     });
 
   }catch(err){

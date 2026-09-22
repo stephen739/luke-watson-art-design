@@ -242,7 +242,6 @@
             '<label>Canvas price<input type="text" maxlength="20" data-field="canvasPrice" value="' + esc(a.canvasPrice) + '" placeholder="$350"></label>' +
             '<label>Print price<input type="text" maxlength="20" data-field="printPrice" value="' + esc(a.printPrice) + '" placeholder="$35"></label>' +
             '<label>Digital Download price<input type="text" maxlength="20" data-field="digitalPrice" value="' + esc(a.digitalPrice) + '" placeholder="$15"></label>' +
-            '<label class="wide">Original canvas purchase link <small>Paste the Square checkout link for this one-of-one canvas. Until you add one, its “Purchase” button does nothing. Print and Digital Download aren\'t linked yet either.</small><input type="url" maxlength="500" data-field="buyUrl" value="' + esc(a.buyUrl) + '" placeholder="https://"></label>' +
             '<label class="check wide"><input type="checkbox" data-field="sold"' + (a.sold ? ' checked' : '') + '> Mark as sold</label>' +
             '<div class="wide">' +
               '<span class="photos-label">Photos <small style="text-transform:none;letter-spacing:0;font-weight:400;">The first photo is the cover shown on the site. Visitors can click through the rest.</small></span>' +
@@ -370,7 +369,7 @@
     if (!btn) return;
     var list = state.content.artworks, action = btn.dataset.action;
     if (action === 'add') {
-      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', canvasPrice:'', printPrice:'', digitalPrice:'', images:[], buyUrl:'', sold:false, _new:true });
+      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', canvasPrice:'', printPrice:'', digitalPrice:'', images:[], sold:false, _new:true });
       markDirty(); render();
       var first = document.querySelector('[data-field="title"]'); if (first) first.focus();
       return;
@@ -419,7 +418,7 @@
         if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
         while (used[id]) id += 'x';
         used[id] = true;
-        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, canvasPrice:a.canvasPrice, printPrice:a.printPrice, digitalPrice:a.digitalPrice, images:a.images, buyUrl:a.buyUrl, sold:a.sold };
+        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, canvasPrice:a.canvasPrice, printPrice:a.printPrice, digitalPrice:a.digitalPrice, images:a.images, sold:a.sold };
       })
     };
     $('save').disabled = true;
