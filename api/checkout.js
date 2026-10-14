@@ -60,8 +60,15 @@ module.exports = async (req, res) => {
   if (!isEmail(buyerEmail)) return res.status(400).json({ error: 'Please enter a valid email address.' });
   if (typeof body.nonce !== 'string' || !body.nonce) return res.status(400).json({ error: 'Missing card details.' });
 
+  if (!process.env.GITHUB_TOKEN) {
+    console.error('checkout: GITHUB_TOKEN is not set');
+    return res.status(503).json({ error: 'Checkout is missing its GITHUB_TOKEN setting in Vercel.' });
+  }
   const live = await readLiveContent();
-  if (!live.ok) return res.status(502).json({ error: 'Could not load current pricing. Please try again.' });
+  if (!live.ok) {
+    console.error('checkout: could not read content.json from GitHub, status', live.status);
+    return res.status(502).json({ error: `Could not load current pricing (GitHub ${live.status || 'unreachable'}). Please try again.` });
+  }
 
   let priced;
   try {
