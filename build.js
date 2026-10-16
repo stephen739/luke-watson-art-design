@@ -81,6 +81,33 @@ const blocks = {
   '<!--NOTE-->': t.art_note
     ? `<div class="square-note reveal">\n      <span>🔒</span>\n      <span>${esc(t.art_note)}</span>\n    </div>`
     : '',
+  '<!--SOCIAL_META-->': (() => {
+    const siteUrl = (process.env.SITE_URL || 'https://lukewatsonart.com').replace(/\/+$/, '');
+    const image = `${siteUrl}/images/og-share.jpg`;
+    const alt = `${t.site_title} — graffiti-style logo surrounded by spray-paint splatters`;
+    return [
+      '<link rel="icon" href="/favicon.ico" sizes="48x48">',
+      '<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">',
+      '<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">',
+      '<link rel="manifest" href="/site.webmanifest">',
+      '<meta name="theme-color" content="#FFFFFF">',
+      '<meta property="og:type" content="website">',
+      `<meta property="og:site_name" content="${esc(t.site_title)}">`,
+      `<meta property="og:title" content="${esc(t.site_title)}">`,
+      `<meta property="og:description" content="${esc(t.site_description)}">`,
+      `<meta property="og:url" content="${esc(siteUrl)}/">`,
+      `<meta property="og:image" content="${esc(image)}">`,
+      '<meta property="og:image:type" content="image/jpeg">',
+      '<meta property="og:image:width" content="1200">',
+      '<meta property="og:image:height" content="630">',
+      `<meta property="og:image:alt" content="${esc(alt)}">`,
+      '<meta name="twitter:card" content="summary_large_image">',
+      `<meta name="twitter:title" content="${esc(t.site_title)}">`,
+      `<meta name="twitter:description" content="${esc(t.site_description)}">`,
+      `<meta name="twitter:image" content="${esc(image)}">`,
+      `<meta name="twitter:image:alt" content="${esc(alt)}">`,
+    ].join('\n');
+  })(),
   '<!--SQUARE_CONFIG-->': (() => {
     const environment = process.env.SQUARE_ENVIRONMENT === 'production' ? 'production' : 'sandbox';
     const sdkUrl = environment === 'production' ? 'https://web.squarecdn.com/v1/square.js' : 'https://sandbox.web.squarecdn.com/v1/square.js';
@@ -106,5 +133,17 @@ fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(dist, { recursive: true });
 fs.writeFileSync(path.join(dist, 'index.html'), html);
 fs.cpSync(path.join(root, 'images'), path.join(dist, 'images'), { recursive: true });
+fs.copyFileSync(path.join(root, 'favicon.ico'), path.join(dist, 'favicon.ico'));
+fs.writeFileSync(path.join(dist, 'site.webmanifest'), JSON.stringify({
+  name: t.site_title,
+  short_name: 'Luke Watson',
+  icons: [
+    { src: '/images/favicon-192.png', sizes: '192x192', type: 'image/png' },
+    { src: '/images/favicon-512.png', sizes: '512x512', type: 'image/png' },
+  ],
+  theme_color: '#FFFFFF',
+  background_color: '#FFFFFF',
+  display: 'browser',
+}, null, 2));
 fs.cpSync(path.join(root, 'admin'), path.join(dist, 'admin'), { recursive: true });
 console.log(`Built site: ${content.artworks.length} artworks`);
