@@ -65,6 +65,7 @@
   label{ display:flex; flex-direction:column; gap:6px; font-size:.74rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft); }
   label small{ font-weight:400; letter-spacing:0; text-transform:none; font-size:.78rem; color:var(--ink-soft); }
   input[type=text],input[type=password],input[type=url],textarea{ width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:var(--paper); font-size:.95rem; letter-spacing:0; text-transform:none; font-weight:400; color:var(--ink); }
+  select[data-field=category]{ width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:var(--paper); font-size:.95rem; letter-spacing:0; text-transform:none; font-weight:400; color:var(--ink); }
   textarea{ resize:vertical; min-height:84px; line-height:1.5; }
   .check{ flex-direction:row; align-items:center; gap:10px; text-transform:none; letter-spacing:0; font-size:.95rem; font-weight:600; color:var(--ink); }
   .check input{ width:20px; height:20px; accent-color:var(--ink); }
@@ -225,6 +226,30 @@
     $('main').innerHTML = state.tab === 'art' ? artHtml() : textHtml();
   }
 
+  function allCategories(){
+    var seen = {}, out = [];
+    state.content.artworks.forEach(function(a){
+      var c = (a.category || '').trim();
+      if (c && !seen[c.toLowerCase()]) { seen[c.toLowerCase()] = true; out.push(c); }
+    });
+    return out;
+  }
+
+  function categoryField(a){
+    var hint = '<small>Shows as a filter button above the artwork on the site. “No category” keeps the piece under “All” only.</small>';
+    if (a._addingCategory) {
+      return '<label>Category ' + hint +
+        '<input type="text" maxlength="40" data-field="category" value="' + esc(a.category) + '" placeholder="Name your new category">' +
+        '<button type="button" class="btn btn-small" data-action="cancel-category" style="align-self:flex-start;margin-top:6px;">Cancel</button></label>';
+    }
+    var cats = allCategories();
+    var cur = (a.category || '').trim();
+    var opts = '<option value=""' + (cur ? '' : ' selected') + '>No category</option>' +
+      cats.map(function(c){ return '<option value="' + esc(c) + '"' + (c.toLowerCase() === cur.toLowerCase() ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') +
+      '<option value="__new__">+ Add new category…</option>';
+    return '<label>Category ' + hint + '<select data-field="category">' + opts + '</select></label>';
+  }
+
   function artHtml(){
     var list = state.content.artworks;
     var html = '<div class="intro"><div><h2>Artwork</h2><p class="help">Pieces appear on the website in this order.</p></div>' +
@@ -241,12 +266,12 @@
           '<div class="fields">' +
             '<label class="wide">Title<input type="text" maxlength="120" data-field="title" value="' + esc(a.title) + '"></label>' +
             '<label class="wide">Funny / short description<textarea maxlength="500" data-field="blurb">' + esc(a.blurb) + '</textarea></label>' +
-            '<label>Category <small>Shown as a filter above the artwork (e.g. Wildlife). Pieces with the same spelling are grouped together. Leave blank to show only under "All".</small><input type="text" maxlength="40" data-field="category" value="' + esc(a.category) + '" placeholder="Wildlife"></label>' +
+            categoryField(a) +
             '<label>Size &amp; materials<input type="text" maxlength="200" data-field="meta" value="' + esc(a.meta) + '" placeholder="Original — 18&quot; x 24&quot; canvas · ink &amp; acrylic"></label>' +
             '<label>Canvas price<input type="text" maxlength="20" data-field="canvasPrice" value="' + esc(a.canvasPrice) + '" placeholder="$350"></label>' +
             '<label>Print price<input type="text" maxlength="20" data-field="printPrice" value="' + esc(a.printPrice) + '" placeholder="$35"></label>' +
             '<label>Digital Download price<input type="text" maxlength="20" data-field="digitalPrice" value="' + esc(a.digitalPrice) + '" placeholder="$15"></label>' +
-            '<label class="check wide"><input type="checkbox" data-field="sold"' + (a.sold ? ' checked' : '') + '> Mark as sold</label>' +
+            '<label class="check wide"><input type="checkbox" data-field="sold"' + (a.sold ? ' checked' : '') + '> Mark Original Canvas as Sold <small style="font-weight:400;">(prints and digital downloads stay available)</small></label>' +
             '<div class="wide">' +
               '<span class="photos-label">Photos <small style="text-transform:none;letter-spacing:0;font-weight:400;">The first photo is the cover shown on the site. Visitors can click through the rest.</small></span>' +
               '<div class="photo-strip">' +
@@ -356,6 +381,7 @@
     var t = e.target;
     if (t.dataset.text) { state.content.text[t.dataset.text] = t.value; markDirty(); return; }
     if (t.dataset.field) {
+      if (t.dataset.field === 'category' && t.value === '__new__') return;
       var f = findArt(t); if (!f) return;
       f.art[t.dataset.field] = t.type === 'checkbox' ? t.checked : t.value;
       markDirty();
@@ -363,6 +389,12 @@
   });
 
   $('main').addEventListener('change', function(e){
+    if (e.target.matches('select[data-field="category"]') && e.target.value === '__new__') {
+      var fc = findArt(e.target);
+      if (fc) { fc.art._prevCategory = fc.art.category || ''; fc.art.category = ''; fc.art._addingCategory = true; markDirty(); render();
+        var box = document.querySelector('[data-id="' + fc.art.id + '"] input[data-field="category"]'); if (box) box.focus(); }
+      return;
+    }
     if (!e.target.matches('[data-file]') || !e.target.files.length) return;
     var f = findArt(e.target);
     if (f) handleFiles(f.art, e.target.files, f.card);
@@ -376,6 +408,12 @@
       list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', canvasPrice:'', printPrice:'', digitalPrice:'', digitalFile:'', category:'', images:[], sold:false, _new:true });
       markDirty(); render();
       var first = document.querySelector('[data-field="title"]'); if (first) first.focus();
+      return;
+    }
+
+    if (action === 'cancel-category') {
+      var fx = findArt(btn); if (!fx) return;
+      fx.art.category = fx.art._prevCategory || ''; fx.art._addingCategory = false; render();
       return;
     }
 
@@ -405,6 +443,14 @@
     t.addEventListener('click', function(){ state.tab = t.dataset.tab; render(); });
   });
 
+  // Reuse an existing spelling ("wildlife" -> "Wildlife"), looking only at the OTHER pieces.
+  function canonCategory(art){
+    var c = String(art.category || '').trim().replace(/\s+/g, ' ');
+    if (!c) return '';
+    var match = state.content.artworks.filter(function(o){ return o !== art && (o.category || '').trim().toLowerCase() === c.toLowerCase(); })[0];
+    return match ? match.category.trim() : c;
+  }
+
   function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'piece'; }
 
   $('save').addEventListener('click', async function(){
@@ -422,7 +468,7 @@
         if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
         while (used[id]) id += 'x';
         used[id] = true;
-        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, canvasPrice:a.canvasPrice, printPrice:a.printPrice, digitalPrice:a.digitalPrice, digitalFile:a.digitalFile || '', category:a.category || '', images:a.images, sold:a.sold };
+        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, canvasPrice:a.canvasPrice, printPrice:a.printPrice, digitalPrice:a.digitalPrice, digitalFile:a.digitalFile || '', category:canonCategory(a), images:a.images, sold:a.sold };
       })
     };
     $('save').disabled = true;
