@@ -1,40 +1,9 @@
 const square = require('../lib/square');
 const { sendEmail, configured: emailConfigured } = require('../lib/email');
 const { readLiveContent, writeLiveContent } = require('../lib/github');
-const { HttpError, priceCart, validateShipping, isEmail, makeDownloadToken } = require('../lib/checkout');
+const { HttpError, priceCart, validateShipping, isEmail, makeDownloadToken, EMAIL_DOWNLOAD_TTL_MS } = require('../lib/checkout');
+const { buyerEmail: buildBuyerEmail, lukeEmail: buildLukeEmail } = require('../lib/orderEmail');
 
-function money(cents) {
-  return `$${(cents / 100).toFixed(2)}`;
-}
-
-function orderEmailHtml({ lines, subtotalCents, shippingCents, totalCents, fulfillment, shipping, buyerName, buyerEmail, forBuyer, downloads }) {
-  const rows = lines
-    .map((l) => `<tr><td>${l.title} — ${l.optionLabel}${l.option === 'print' ? ` × ${l.qty}` : ''}</td><td style="text-align:right">${money(l.lineCents)}</td></tr>`)
-    .join('');
-  const fulfillmentHtml = fulfillment
-    ? fulfillment === 'shipping'
-      ? `<p><strong>Shipping</strong> (+$10)<br>${shipping.name}<br>${shipping.line1}${shipping.line2 ? '<br>' + shipping.line2 : ''}<br>${shipping.city}, ${shipping.state} ${shipping.zip}<br>${shipping.phone}</p>`
-      : `<p><strong>Local pickup</strong> — Lubbock, TX. ${forBuyer ? "Luke will follow up with pickup details." : 'Follow up with the buyer for pickup details.'}</p>`
-    : '';
-  const downloadsHtml =
-    forBuyer && downloads?.length
-      ? `<p><strong>Your digital download${downloads.length > 1 ? 's' : ''}:</strong><br>${downloads
-          .map((d) => (d.url ? `<a href="${d.url}">${d.title}</a> (link expires in 30 minutes)` : `${d.title} — Luke will email this file to you directly.`))
-          .join('<br>')}</p>`
-      : '';
-  return `
-    <div style="font-family:sans-serif;color:#16150F;max-width:480px;">
-      <h2 style="font-family:sans-serif;">${forBuyer ? 'Thanks for your order!' : 'New order on lukewatsonart'}</h2>
-      <p>${forBuyer ? '' : `<strong>${buyerName}</strong> — ${buyerEmail}<br>`}</p>
-      <table style="width:100%;border-collapse:collapse;">${rows}
-        <tr><td style="padding-top:8px;">Subtotal</td><td style="text-align:right;padding-top:8px;">${money(subtotalCents)}</td></tr>
-        ${shippingCents ? `<tr><td>Shipping</td><td style="text-align:right;">${money(shippingCents)}</td></tr>` : ''}
-        <tr><td style="font-weight:bold;padding-top:6px;">Total</td><td style="text-align:right;font-weight:bold;padding-top:6px;">${money(totalCents)}</td></tr>
-      </table>
-      ${fulfillmentHtml}
-      ${downloadsHtml}
-    </div>`;
-}
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -104,21 +73,30 @@ module.exports = async (req, res) => {
     }
   }
 
+  const siteUrl = (process.env.SITE_URL || `https://${req.headers.host}`).replace(/\/$/, '');
   const downloads = priced.lines
     .filter((l) => l.option === 'digital')
-    .map((l) => ({
-      artworkId: l.artworkId,
-      title: l.title,
-      url: l.artwork.digitalFile ? `/api/download?token=${encodeURIComponent(makeDownloadToken(l.artworkId))}` : null,
-    }));
+    .map((l) => {
+      const hasFile = Boolean(l.artwork.digitalFile);
+      return {
+        artworkId: l.artworkId,
+        title: l.title,
+        url: hasFile ? `/api/download?token=${encodeURIComponent(makeDownloadToken(l.artworkId))}` : null,
+        emailUrl: hasFile ? `${siteUrl}/api/download?token=${encodeURIComponent(makeDownloadToken(l.artworkId, EMAIL_DOWNLOAD_TTL_MS))}` : null,
+      };
+    });
 
   if (emailConfigured()) {
-    const shared = { lines: priced.lines, subtotalCents: priced.subtotalCents, shippingCents: priced.shippingCents, totalCents: priced.totalCents, fulfillment: priced.fulfillment, shipping, buyerName, buyerEmail, downloads };
+    const order = { siteUrl, lines: priced.lines, subtotalCents: priced.subtotalCents, shippingCents: priced.shippingCents, totalCents: priced.totalCents, fulfillment: priced.fulfillment, shipping, buyerName, buyerEmail: buyerEmail, downloads };
+    const toBuyer = buildBuyerEmail(order);
+    const toLuke = buildLukeEmail(order);
     await Promise.all([
-      sendEmail({ to: process.env.NOTIFY_EMAIL, subject: `New order — ${money(priced.totalCents)}`, html: orderEmailHtml({ ...shared, forBuyer: false }) }),
-      sendEmail({ to: buyerEmail, subject: 'Your Luke Watson Art & Design order', html: orderEmailHtml({ ...shared, forBuyer: true }) }),
+      sendEmail({ to: process.env.NOTIFY_EMAIL, subject: toLuke.subject, html: toLuke.html, replyTo: buyerEmail }),
+      sendEmail({ to: buyerEmail, subject: toBuyer.subject, html: toBuyer.html, replyTo: process.env.NOTIFY_EMAIL }),
     ]);
+  } else {
+    console.error('checkout: order completed but email is not configured (RESEND_API_KEY / NOTIFY_EMAIL)');
   }
 
-  res.status(200).json({ success: true, totalCents: priced.totalCents, downloads });
+  res.status(200).json({ success: true, totalCents: priced.totalCents, downloads: downloads.map(({ artworkId, title, url }) => ({ artworkId, title, url })) });
 };
