@@ -408,6 +408,7 @@
   }
   footer a{ text-decoration:none; font-weight:600; }
   footer a:hover{ color:var(--sage); }
+  .admin-link{ opacity:.7; }
   .foot-inner{ max-width:1100px; margin-inline:auto; display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center; justify-content:space-between; }
 </style>
 </head>
@@ -646,7 +647,7 @@
   <div class="foot-inner">
     <span>© <span id="year"></span> {{footer_text}}</span>
     <span><a href="{{instagram_url}}" target="_blank" rel="noopener">{{instagram_handle}}</a></span>
-    <a href="#home">Back to top ↑</a>
+    <span class="foot-links"><a href="/admin" class="admin-link" rel="nofollow">Admin</a> · <a href="#home">Back to top ↑</a></span>
   </div>
 </footer>
 
