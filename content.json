@@ -44,7 +44,8 @@
       "canvasPrice": "$350",
       "printPrice": "$35",
       "digitalPrice": "$15",
-      "digitalFile": "digital-assets/mountain-lion.jpg"
+      "digitalFile": "digital-assets/mountain-lion.jpg",
+      "category": "Wildlife"
     },
     {
       "id": "black-bear",
@@ -59,7 +60,8 @@
       "canvasPrice": "$350",
       "printPrice": "$35",
       "digitalPrice": "$15",
-      "digitalFile": "digital-assets/black-bear.jpg"
+      "digitalFile": "digital-assets/black-bear.jpg",
+      "category": "Wildlife"
     },
     {
       "id": "blue-skull",
@@ -74,7 +76,8 @@
       "canvasPrice": "$75",
       "printPrice": "$25",
       "digitalPrice": "$15",
-      "digitalFile": "digital-assets/blue-skull.jpg"
+      "digitalFile": "digital-assets/blue-skull.jpg",
+      "category": "Characters"
     },
     {
       "id": "agave",
@@ -89,7 +92,8 @@
       "canvasPrice": "$75",
       "printPrice": "$25",
       "digitalPrice": "$15",
-      "digitalFile": "digital-assets/agave.jpg"
+      "digitalFile": "digital-assets/agave.jpg",
+      "category": "Botanical"
     },
     {
       "id": "faces",
@@ -104,7 +108,8 @@
       "canvasPrice": "$75",
       "printPrice": "$25",
       "digitalPrice": "$15",
-      "digitalFile": "digital-assets/faces.jpg"
+      "digitalFile": "digital-assets/faces.jpg",
+      "category": "Characters"
     }
   ]
 }

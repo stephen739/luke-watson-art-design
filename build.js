@@ -44,7 +44,7 @@ function renderArtwork(a) {
           <span class="art-count" data-count>1 / ${a.images.length}</span>`
     : '';
   return `
-      <article class="art-card reveal">
+      <article class="art-card reveal" data-category="${esc(a.category || '')}">
         <div class="art-visual"${multi ? ` data-images='${JSON.stringify(a.images).replace(/'/g, '&#39;')}' tabindex="0" role="button" aria-label="${esc(`View photos of ${a.title}`)}"` : ''}>
           <img class="art-photo" src="${esc(a.images[0])}" alt="${esc(`Original artwork: ${a.title}`)}" loading="lazy">${a.sold ? '\n          <span class="sold-badge">Sold</span>' : ''}${nav}
         </div>
@@ -70,6 +70,14 @@ const blocks = {
   '<!--ARTWORKS-->': content.artworks.length
     ? content.artworks.map(renderArtwork).join('\n')
     : '<p class="art-empty">New work is on the way — check back soon.</p>',
+  '<!--ART_FILTERS-->': (() => {
+    const cats = [...new Set(content.artworks.map((a) => a.category).filter(Boolean))];
+    if (cats.length < 2) return '';
+    const chip = (label, value, pressed) => `<button type="button" class="filter-chip" data-filter="${esc(value)}" aria-pressed="${pressed}">${esc(label)}</button>`;
+    return `<div class="art-filters reveal" role="group" aria-label="Filter artwork">
+      ${chip('All', '', true)}${cats.map((c) => chip(c, c, false)).join('')}
+    </div>`;
+  })(),
   '<!--NOTE-->': t.art_note
     ? `<div class="square-note reveal">\n      <span>🔒</span>\n      <span>${esc(t.art_note)}</span>\n    </div>`
     : '',
