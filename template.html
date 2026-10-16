@@ -797,7 +797,7 @@
           var value = chip.dataset.filter;
           chips.forEach(function(c){ c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
           document.querySelectorAll('.art-card').forEach(function(card){
-            var show = !value || card.dataset.category === value;
+            var show = !value || (value === '__available__' ? card.dataset.sold !== 'true' : card.dataset.category === value);
             card.hidden = !show;
             if(show) card.classList.add('is-visible');
           });
