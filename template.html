@@ -394,6 +394,9 @@
     background:rgba(143,180,122,.16); border:1px solid var(--sage); color:var(--paper); font-size:.9rem;
   }
   .success-msg.show{ display:block; }
+  .cf-error{ color:#F2A199; font-size:.9rem; font-weight:600; }
+  .cf-error[hidden]{ display:none; }
+  .hp-field{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 
   /* ---------- Footer ---------- */
   footer{
@@ -584,7 +587,7 @@
       </div>
     </div>
 
-    <form id="contact-form" class="reveal" data-form-endpoint="" novalidate>
+    <form id="contact-form" class="reveal" novalidate>
       <div class="row-2">
         <div class="field">
           <label for="cf-name">Name</label>
@@ -627,9 +630,11 @@
         <textarea id="cf-message" name="message" rows="4" placeholder="Tell Luke a bit more..."></textarea>
       </div>
 
-      <button type="submit" class="btn btn-primary" style="align-self:flex-start; background:var(--gold); border-color:var(--gold); color:var(--ink);">Send it over</button>
-      <p class="form-note">This form isn't connected to an inbox yet — hook it up to Formspree, Squarespace, or another form backend before launch.</p>
-      <div class="success-msg" id="cf-success">Thanks — Luke will get back to you soon.</div>
+      <div class="hp-field" aria-hidden="true"><label for="cf-website">Leave this field empty</label><input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+
+      <button type="submit" class="btn btn-primary" id="cf-submit" style="align-self:flex-start; background:var(--gold); border-color:var(--gold); color:var(--ink);">Send it over</button>
+      <div class="success-msg" id="cf-success" role="status" aria-live="polite">Thanks — Luke will get back to you soon.</div>
+      <p class="cf-error" id="cf-error" role="alert" hidden></p>
     </form>
   </div>
 </section>
@@ -684,19 +689,31 @@
 
     var form = document.getElementById('contact-form');
     var success = document.getElementById('cf-success');
+    var formError = document.getElementById('cf-error');
+    var submitBtn = document.getElementById('cf-submit');
     if(form){
       form.addEventListener('submit', function(e){
         e.preventDefault();
+        success.classList.remove('show');
+        formError.hidden = true;
         if(!form.checkValidity()){ form.reportValidity(); return; }
-        var endpoint = form.dataset.formEndpoint;
-        if(endpoint){
-          fetch(endpoint, { method:'POST', body:new FormData(form), headers:{ 'Accept':'application/json' } })
-            .then(function(){ success.classList.add('show'); form.reset(); })
-            .catch(function(){ success.textContent = 'Could not send — please email directly for now.'; success.classList.add('show'); });
-        } else {
-          success.classList.add('show');
-          form.reset();
-        }
+        var payload = {};
+        new FormData(form).forEach(function(v, k){ payload[k] = v; });
+        submitBtn.disabled = true;
+        var label = submitBtn.textContent;
+        submitBtn.textContent = 'Sending\u2026';
+        fetch('/api/contact', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) })
+          .then(function(res){ return res.json().then(function(data){ return { ok: res.ok, data: data }; }); })
+          .then(function(r){
+            if(!r.ok) throw new Error(r.data.error || 'Sorry, something went wrong. Please try again.');
+            success.classList.add('show');
+            form.reset();
+          })
+          .catch(function(err){
+            formError.textContent = err.message || 'Sorry, something went wrong. Please try again.';
+            formError.hidden = false;
+          })
+          .then(function(){ submitBtn.disabled = false; submitBtn.textContent = label; });
       });
     }
 
