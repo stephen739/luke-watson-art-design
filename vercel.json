@@ -8,16 +8,6 @@
   },
   "rewrites": [
     {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "admin.lukewatsonart.com"
-        }
-      ],
-      "destination": "/admin/index.html"
-    },
-    {
       "source": "/admin",
       "destination": "/admin/index.html"
     }
@@ -50,6 +40,19 @@
           "value": "noindex, nofollow"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.lukewatsonart.com"
+        }
+      ],
+      "destination": "/admin",
+      "permanent": false
     }
   ]
 }
