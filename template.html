@@ -299,6 +299,7 @@
   .cart-line-remove:hover{ color:var(--danger,#B3261E); }
   .cart-drawer-foot{ padding:18px 20px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:10px; }
   .cart-subtotal{ display:flex; justify-content:space-between; font-weight:700; font-size:1.05rem; margin-bottom:4px; }
+  .cart-tax-note{ font-size:.78rem; color:var(--ink-soft); margin:-4px 0 4px; }
   .btn-ghost-line{ background:transparent; color:var(--ink); border:1px solid var(--line); }
   .btn-ghost-line:hover{ background:var(--paper-soft); }
 
@@ -478,6 +479,7 @@
   <div class="cart-lines" id="cart-lines"></div>
   <div class="cart-drawer-foot">
     <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+    <p class="cart-tax-note">Sales tax and shipping are calculated at checkout.</p>
     <button type="button" class="btn btn-primary cart-checkout-btn" id="cart-checkout-btn">Checkout</button>
     <button type="button" class="btn btn-ghost-line" id="cart-continue-btn">Continue Shopping</button>
   </div>
@@ -865,23 +867,37 @@
     var checkoutModal = document.getElementById('checkout-modal');
     var squarePayments = null, squareCard = null;
 
+    function isTexasState(v){ v = String(v || '').toLowerCase().replace(/[^a-z]/g, ''); return v === 'tx' || v === 'texas'; }
+
+    // Mirrors the server: pickup, Texas shipments and digital-only orders are taxed (shipping included).
+    // The server recomputes everything; this only decides what to display.
+    function computeTotals(){
+      var subtotalC = Math.round(cartSubtotal() * 100);
+      var hasPhysical = cartHasPhysical();
+      var shippingChecked = hasPhysical && document.querySelector('input[name="co-fulfillment"][value="shipping"]').checked;
+      var shippingC = shippingChecked ? 1000 : 0;
+      var taxable = !hasPhysical || !shippingChecked || isTexasState(document.getElementById('co-ship-state').value);
+      var rate = (window.LW_TAX && window.LW_TAX.ratePercent) || 0;
+      var taxC = taxable && rate > 0 ? Math.round((subtotalC + shippingC) * rate / 100) : 0;
+      return { subtotalC: subtotalC, shippingC: shippingC, taxC: taxC, rate: rate, totalC: subtotalC + shippingC + taxC, hasPhysical: hasPhysical };
+    }
+
     function renderCheckoutSummary(){
       var linesWrap = document.getElementById('checkout-lines');
       linesWrap.innerHTML = cart.map(function(l){
-        return '<div class="checkout-line-row"><span>' + escHtml(l.title) + ' — ' + escHtml(l.label) + (l.option === 'print' ? ' × ' + l.qty : '') + '</span><span>' + fmtMoney(parsePrice(l.price) * l.qty) + '</span></div>';
+        return '<div class="checkout-line-row"><span>' + escHtml(l.title) + ' \u2014 ' + escHtml(l.label) + (l.option === 'print' ? ' \u00d7 ' + l.qty : '') + '</span><span>' + fmtMoney(parsePrice(l.price) * l.qty) + '</span></div>';
       }).join('');
-      var subtotal = cartSubtotal();
-      var hasPhysical = cartHasPhysical();
-      document.getElementById('checkout-fulfillment').hidden = !hasPhysical;
-      var shippingChecked = hasPhysical && document.querySelector('input[name="co-fulfillment"][value="shipping"]').checked;
-      var shippingFee = shippingChecked ? 10 : 0;
-      var total = subtotal + shippingFee;
+      var tt = computeTotals();
+      document.getElementById('checkout-fulfillment').hidden = !tt.hasPhysical;
       document.getElementById('checkout-totals').innerHTML =
-        '<div class="checkout-line-row"><span>Subtotal</span><span>' + fmtMoney(subtotal) + '</span></div>' +
-        (shippingFee ? '<div class="checkout-line-row"><span>Shipping</span><span>' + fmtMoney(shippingFee) + '</span></div>' : '') +
-        '<div class="checkout-line-row grand"><span>Total</span><span>' + fmtMoney(total) + '</span></div>';
-      document.getElementById('checkout-pay-btn').textContent = 'Pay ' + fmtMoney(total);
+        '<div class="checkout-line-row"><span>Subtotal</span><span>' + fmtMoney(tt.subtotalC / 100) + '</span></div>' +
+        (tt.shippingC ? '<div class="checkout-line-row"><span>Shipping</span><span>' + fmtMoney(tt.shippingC / 100) + '</span></div>' : '') +
+        (tt.taxC ? '<div class="checkout-line-row"><span>Sales tax (' + tt.rate + '%)</span><span>' + fmtMoney(tt.taxC / 100) + '</span></div>' : '') +
+        '<div class="checkout-line-row grand"><span>Total</span><span>' + fmtMoney(tt.totalC / 100) + '</span></div>';
+      document.getElementById('checkout-pay-btn').textContent = 'Pay ' + fmtMoney(tt.totalC / 100);
     }
+
+    document.getElementById('co-ship-state').addEventListener('input', renderCheckoutSummary);
 
     document.querySelectorAll('input[name="co-fulfillment"]').forEach(function(r){
       r.addEventListener('change', function(){

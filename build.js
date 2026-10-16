@@ -81,7 +81,7 @@ const blocks = {
       locationId: process.env.SQUARE_LOCATION_ID || '',
       environment,
     };
-    return `<script>window.LW_SQUARE = ${JSON.stringify(config)};</script>\n<script src="${sdkUrl}"></script>`;
+    return `<script>window.LW_SQUARE = ${JSON.stringify(config)}; window.LW_TAX = ${JSON.stringify({ ratePercent: Number(t.sales_tax_rate) || 0 })};</script>\n<script src="${sdkUrl}"></script>`;
   })(),
 };
 for (const [marker, value] of Object.entries(blocks)) {

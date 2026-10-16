@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
 
   let priced;
   try {
-    priced = priceCart(live.content.artworks, { items: body.items, fulfillment: body.fulfillment });
+    priced = priceCart(live.content.artworks, { items: body.items, fulfillment: body.fulfillment, shippingState: body.shipping?.state, taxRatePercent: live.content.text.sales_tax_rate });
   } catch (e) {
     if (e instanceof HttpError) return res.status(e.status).json({ error: e.message });
     return res.status(500).json({ error: 'Something went wrong pricing your order.' });
@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
     }
   }
 
-  const note = priced.lines.map((l) => `${l.title} (${l.optionLabel}${l.option === 'print' ? ` x${l.qty}` : ''})`).join(', ');
+  const note = priced.lines.map((l) => `${l.title} (${l.optionLabel}${l.option === 'print' ? ` x${l.qty}` : ''})`).join(', ') + (priced.taxCents ? ` | tax ${(priced.taxCents / 100).toFixed(2)}` : '');
   const payment = await square.createPayment({ nonce: body.nonce, amountCents: priced.totalCents, buyerEmail, note });
   if (!payment.ok) return res.status(402).json({ error: payment.message || 'The card was declined.' });
 
@@ -87,7 +87,7 @@ module.exports = async (req, res) => {
     });
 
   if (emailConfigured()) {
-    const order = { siteUrl, lines: priced.lines, subtotalCents: priced.subtotalCents, shippingCents: priced.shippingCents, totalCents: priced.totalCents, fulfillment: priced.fulfillment, shipping, buyerName, buyerEmail: buyerEmail, downloads };
+    const order = { siteUrl, lines: priced.lines, subtotalCents: priced.subtotalCents, shippingCents: priced.shippingCents, taxCents: priced.taxCents, taxRatePercent: priced.taxRatePercent, totalCents: priced.totalCents, fulfillment: priced.fulfillment, shipping, buyerName, buyerEmail: buyerEmail, downloads };
     const toBuyer = buildBuyerEmail(order);
     const toLuke = buildLukeEmail(order);
     await Promise.all([
