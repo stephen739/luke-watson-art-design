@@ -338,6 +338,9 @@
   .checkout-panel .check input{ margin-top:3px; accent-color:var(--ink); }
   .checkout-shipping{ display:flex; flex-direction:column; gap:14px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
   .checkout-shipping[hidden]{ display:none; }
+  .checkout-pickup{ display:flex; flex-direction:column; gap:14px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
+  .checkout-pickup[hidden]{ display:none; }
+  .pickup-note{ font-size:.85rem; color:var(--ink-soft); }
   #card-container{ padding:4px 0; }
   .checkout-error{ color:#B3261E; font-size:.88rem; font-weight:600; }
   .checkout-error[hidden]{ display:none; }
@@ -513,9 +516,19 @@
 
         <div class="field checkout-fulfillment" id="checkout-fulfillment" hidden>
           <label style="margin-bottom:4px;">Fulfillment</label>
-          <label class="check"><input type="radio" name="co-fulfillment" value="pickup" checked> Local Pickup — Lubbock, TX <small>(details to follow from Luke)</small></label>
+          <label class="check"><input type="radio" name="co-fulfillment" value="pickup" checked> Local Pickup — Lubbock, TX <small>(Luke will coordinate details directly)</small></label>
           <label class="check"><input type="radio" name="co-fulfillment" value="shipping"> Shipping <small>(+$10 flat rate)</small></label>
-          <div class="checkout-shipping" id="checkout-shipping" hidden>
+          <div class="checkout-pickup" id="checkout-pickup">
+          <div class="field"><label for="co-pickup-phone">Phone number</label><input id="co-pickup-phone" type="tel" autocomplete="tel" placeholder="(806) 555-0123"></div>
+          <div class="field">
+            <label>Preferred method of contact</label>
+            <label class="check"><input type="radio" name="co-contact" value="email"> Email</label>
+            <label class="check"><input type="radio" name="co-contact" value="text"> Text message</label>
+            <label class="check"><input type="radio" name="co-contact" value="phone"> Phone call</label>
+          </div>
+          <p class="pickup-note">Luke will coordinate pickup details with you directly.</p>
+        </div>
+        <div class="checkout-shipping" id="checkout-shipping" hidden>
             <div class="field"><label for="co-ship-name">Full name</label><input id="co-ship-name" type="text"></div>
             <div class="field"><label for="co-ship-line1">Address</label><input id="co-ship-line1" type="text" placeholder="Street address"></div>
             <div class="field"><label for="co-ship-line2">Address line 2 (optional)</label><input id="co-ship-line2" type="text"></div>
@@ -902,6 +915,7 @@
     document.querySelectorAll('input[name="co-fulfillment"]').forEach(function(r){
       r.addEventListener('change', function(){
         document.getElementById('checkout-shipping').hidden = r.value !== 'shipping';
+        document.getElementById('checkout-pickup').hidden = r.value !== 'pickup';
         renderCheckoutSummary();
       });
     });
@@ -954,9 +968,16 @@
       if(!email || email.indexOf('@') === -1){ setCheckoutError('Please enter a valid email address.'); return; }
 
       var hasPhysical = cartHasPhysical();
-      var fulfillment = null, shipping = null;
+      var fulfillment = null, shipping = null, pickup = null;
       if(hasPhysical){
         fulfillment = document.querySelector('input[name="co-fulfillment"]:checked').value;
+        if(fulfillment === 'pickup'){
+          var pickupPhone = document.getElementById('co-pickup-phone').value.trim();
+          var contactChoice = document.querySelector('input[name="co-contact"]:checked');
+          if(pickupPhone.replace(/\D/g, '').length < 10){ setCheckoutError('Please enter a valid phone number so Luke can coordinate pickup.'); return; }
+          if(!contactChoice){ setCheckoutError('Please choose how you prefer to be contacted: email, text, or phone call.'); return; }
+          pickup = { phone: pickupPhone, contactMethod: contactChoice.value };
+        }
         if(fulfillment === 'shipping'){
           shipping = {
             name: document.getElementById('co-ship-name').value.trim(),
@@ -987,7 +1008,7 @@
         return fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: items, fulfillment: fulfillment, shipping: shipping, buyerName: name, buyerEmail: email, nonce: result.token })
+          body: JSON.stringify({ items: items, fulfillment: fulfillment, shipping: shipping, pickup: pickup, buyerName: name, buyerEmail: email, nonce: result.token })
         }).then(function(res){
           return res.json().then(function(data){ return { ok: res.ok, data: data }; });
         });

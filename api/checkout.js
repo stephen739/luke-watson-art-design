@@ -1,7 +1,7 @@
 const square = require('../lib/square');
 const { sendEmail, configured: emailConfigured } = require('../lib/email');
 const { readLiveContent, writeLiveContent } = require('../lib/github');
-const { HttpError, priceCart, validateShipping, isEmail, makeDownloadToken, EMAIL_DOWNLOAD_TTL_MS } = require('../lib/checkout');
+const { HttpError, priceCart, validateShipping, validatePickup, isEmail, makeDownloadToken, EMAIL_DOWNLOAD_TTL_MS } = require('../lib/checkout');
 const { buyerEmail: buildBuyerEmail, lukeEmail: buildLukeEmail } = require('../lib/orderEmail');
 
 
@@ -48,12 +48,12 @@ module.exports = async (req, res) => {
   }
 
   let shipping = null;
-  if (priced.fulfillment === 'shipping') {
-    try {
-      shipping = validateShipping(body.shipping);
-    } catch (e) {
-      return res.status(e.status || 400).json({ error: e.message });
-    }
+  let pickup = null;
+  try {
+    if (priced.fulfillment === 'shipping') shipping = validateShipping(body.shipping);
+    if (priced.fulfillment === 'pickup') pickup = validatePickup(body.pickup);
+  } catch (e) {
+    return res.status(e.status || 400).json({ error: e.message });
   }
 
   const note = priced.lines.map((l) => `${l.title} (${l.optionLabel}${l.option === 'print' ? ` x${l.qty}` : ''})`).join(', ') + (priced.taxCents ? ` | tax ${(priced.taxCents / 100).toFixed(2)}` : '');
@@ -87,7 +87,7 @@ module.exports = async (req, res) => {
     });
 
   if (emailConfigured()) {
-    const order = { siteUrl, lines: priced.lines, subtotalCents: priced.subtotalCents, shippingCents: priced.shippingCents, taxCents: priced.taxCents, taxRatePercent: priced.taxRatePercent, totalCents: priced.totalCents, fulfillment: priced.fulfillment, shipping, buyerName, buyerEmail: buyerEmail, downloads };
+    const order = { siteUrl, lines: priced.lines, subtotalCents: priced.subtotalCents, shippingCents: priced.shippingCents, taxCents: priced.taxCents, taxRatePercent: priced.taxRatePercent, totalCents: priced.totalCents, fulfillment: priced.fulfillment, shipping, pickup, buyerName, buyerEmail: buyerEmail, downloads };
     const toBuyer = buildBuyerEmail(order);
     const toLuke = buildLukeEmail(order);
     await Promise.all([
