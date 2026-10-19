@@ -4,6 +4,9 @@
   "functions": {
     "api/download.js": {
       "includeFiles": "digital-assets/**"
+    },
+    "api/contact.js": {
+      "includeFiles": "content.json"
     }
   },
   "rewrites": [

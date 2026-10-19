@@ -1,6 +1,7 @@
 const { sendEmail, configured: emailConfigured } = require('../lib/email');
 const { inquiryEmail } = require('../lib/orderEmail');
 const { isEmail } = require('../lib/checkout');
+const { contactEmail } = require('../lib/recipient');
 
 const REASONS = ['General Contact', 'Order Information', 'Book Luke or Collaborate'];
 const SOURCES = ['Social Media', 'Art Show', 'Online', 'Word of Mouth'];
@@ -22,9 +23,11 @@ module.exports = async (req, res) => {
   // Honeypot: real visitors never see or fill this field. Pretend success so bots move on.
   if (clean(body.website, 200)) return res.status(200).json({ success: true });
 
-  const to = process.env.CONTACT_FORM_EMAIL || process.env.NOTIFY_EMAIL;
+  let published = null;
+  try { published = require('../content.json'); } catch (e) { /* fall back to env/default */ }
+  const to = contactEmail(published);
   if (!emailConfigured() || !to) {
-    console.error('contact: email is not configured (SMTP2GO_API_KEY/RESEND_API_KEY and CONTACT_FORM_EMAIL)');
+    console.error('contact: email is not configured (SMTP2GO_API_KEY/RESEND_API_KEY)');
     return res.status(503).json({ error: 'The contact form is not available right now. Please message Luke on Instagram instead.' });
   }
 

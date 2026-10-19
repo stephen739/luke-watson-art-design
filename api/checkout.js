@@ -1,5 +1,6 @@
 const square = require('../lib/square');
 const { sendEmail, configured: emailConfigured } = require('../lib/email');
+const { contactEmail } = require('../lib/recipient');
 const { readLiveContent, writeLiveContent } = require('../lib/github');
 const { HttpError, priceCart, validateShipping, validatePickup, isEmail, makeDownloadToken, EMAIL_DOWNLOAD_TTL_MS } = require('../lib/checkout');
 const { buyerEmail: buildBuyerEmail, lukeEmail: buildLukeEmail } = require('../lib/orderEmail');
@@ -87,15 +88,16 @@ module.exports = async (req, res) => {
     });
 
   if (emailConfigured()) {
-    const order = { siteUrl, lines: priced.lines, subtotalCents: priced.subtotalCents, shippingCents: priced.shippingCents, taxCents: priced.taxCents, taxRatePercent: priced.taxRatePercent, totalCents: priced.totalCents, fulfillment: priced.fulfillment, shipping, pickup, buyerName, buyerEmail: buyerEmail, downloads };
+    const luke = contactEmail(live.content);
+    const order = { siteUrl, contactEmail: luke, lines: priced.lines, subtotalCents: priced.subtotalCents, shippingCents: priced.shippingCents, taxCents: priced.taxCents, taxRatePercent: priced.taxRatePercent, totalCents: priced.totalCents, fulfillment: priced.fulfillment, shipping, pickup, buyerName, buyerEmail: buyerEmail, downloads };
     const toBuyer = buildBuyerEmail(order);
     const toLuke = buildLukeEmail(order);
     await Promise.all([
-      sendEmail({ to: process.env.NOTIFY_EMAIL, subject: toLuke.subject, html: toLuke.html, replyTo: buyerEmail }),
-      sendEmail({ to: buyerEmail, subject: toBuyer.subject, html: toBuyer.html, replyTo: process.env.NOTIFY_EMAIL }),
+      sendEmail({ to: luke, subject: toLuke.subject, html: toLuke.html, replyTo: buyerEmail }),
+      sendEmail({ to: buyerEmail, subject: toBuyer.subject, html: toBuyer.html, replyTo: luke }),
     ]);
   } else {
-    console.error('checkout: order completed but email is not configured (RESEND_API_KEY / NOTIFY_EMAIL)');
+    console.error('checkout: order completed but email is not configured (SMTP2GO_API_KEY / RESEND_API_KEY)');
   }
 
   res.status(200).json({ success: true, totalCents: priced.totalCents, downloads: downloads.map(({ artworkId, title, url }) => ({ artworkId, title, url })) });
