@@ -2,5 +2,10 @@
   "name": "luke-watson-art-design",
   "private": true,
   "version": "1.0.0",
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@vercel/blob": "2.8.2"
+  }
 }

@@ -97,7 +97,18 @@
   .photo.drop-target img{ outline:3px solid var(--gold); outline-offset:2px; }
   .photo.drop-target::after{ content:attr(data-drop-label); position:absolute; left:0; right:0; bottom:30px; text-align:center; font-size:.62rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#fff; background:var(--ink); border-radius:999px; padding:2px 0; pointer-events:none; }
   .photo-ghost{ position:fixed; z-index:50; pointer-events:none; width:84px; height:105px; object-fit:cover; border-radius:8px; border:2px solid var(--gold); box-shadow:0 10px 24px rgba(0,0,0,.28); transform:translate(-50%,-50%) rotate(-3deg); opacity:.92; }
-  .photo-strip.file-over{ outline:2px dashed var(--gold); outline-offset:6px; border-radius:8px; }
+  .photo-strip.file-over, .digital-file.file-over{ outline:2px dashed var(--gold); outline-offset:6px; border-radius:8px; }
+  .digital-file{ border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--soft); }
+  .digital-file .photos-label{ margin-bottom:6px; }
+  .digital-status{ margin:6px 0 10px; font-size:.92rem; word-break:break-all; }
+  .digital-status.ok{ color:#2C6B1F; }
+  .digital-status.warn{ color:#7A5A00; }
+  .digital-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+  .digital-actions label.btn{ cursor:pointer; }
+  .digital-hint{ font-size:.82rem; color:var(--ink-soft); }
+  .progress{ position:relative; margin-top:10px; height:22px; border-radius:999px; background:#E6E4DC; overflow:hidden; }
+  .progress-bar{ height:100%; width:0; background:var(--gold); transition:width .2s; }
+  .progress-text{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; }
   body.photo-dragging, body.photo-dragging *{ cursor:grabbing !important; }
   .photo-add{
     width:84px; height:105px; border-radius:8px; border:1px dashed var(--line); background:var(--soft);
@@ -382,6 +393,7 @@
                 '</label>' +
               '</div>' +
             '</div>' +
+            digitalBlock(a) +
           '</div>' +
           '<div class="row-actions">' +
             '<button class="btn btn-small" type="button" data-action="up"' + (i === 0 ? ' disabled' : '') + '>↑ Move up</button>' +
@@ -393,6 +405,26 @@
       '</section>';
     });
     return html;
+  }
+
+  function digitalBlock(a){
+    var has = !!a.digitalFile;
+    var legacy = has && a.digitalFile.indexOf('blob:') !== 0;
+    var name = a.digitalFileName || (has ? a.digitalFile.split('/').pop() : '');
+    return '<div class="wide digital-file" data-digital>' +
+      '<span class="photos-label">Digital download file <small style="text-transform:none;letter-spacing:0;font-weight:400;">Private — never shown on the website. This is the print-ready file customers receive after buying the Digital Download (JPG, PNG, TIFF, PDF or ZIP, up to 250 MB).</small></span>' +
+      (has
+        ? '<p class="digital-status ok">✔ <strong>' + esc(name) + '</strong>' + (legacy ? ' <small>(stored with the website)</small>' : '') + '</p>'
+        : '<p class="digital-status warn">⚠ No file uploaded yet. Customers who buy the download will be told Luke will email it to them.</p>') +
+      '<div class="digital-actions">' +
+        '<label class="btn btn-small">' + (has ? 'Replace file' : 'Upload file') +
+          '<input type="file" data-digital-file accept=".jpg,.jpeg,.png,.tif,.tiff,.pdf,.zip" style="display:none"></label>' +
+        (has ? '<button type="button" class="btn btn-small btn-danger" data-action="remove-digital">Remove file</button>' : '') +
+        '<span class="digital-hint">or drag a file here. Goes live when you click Save &amp; publish.</span>' +
+      '</div>' +
+      '<div class="progress" data-progress hidden><div class="progress-bar"></div><span class="progress-text"></span></div>' +
+      '<p class="err-text" data-digital-err hidden></p>' +
+    '</div>';
   }
 
   function coverSrc(path){
@@ -445,6 +477,45 @@
     err.hidden = true;
     uploading++;
     try { await uploadAll(art, files, err); } finally { uploading--; }
+  }
+
+  var DIGITAL_MAX = 250 * 1024 * 1024;
+
+  async function uploadDigital(art, file, card){
+    var box = card.querySelector('[data-digital]');
+    var err = box.querySelector('[data-digital-err]');
+    var prog = box.querySelector('[data-progress]');
+    var bar = prog.querySelector('.progress-bar');
+    var txt = prog.querySelector('.progress-text');
+    err.hidden = true;
+    var ext = (file.name.match(/\.([A-Za-z0-9]+)$/) || [])[1];
+    ext = ext ? ext.toLowerCase() : '';
+    if (['jpg','jpeg','png','tif','tiff','pdf','zip'].indexOf(ext) === -1) { err.textContent = 'Please choose a JPG, PNG, TIFF, PDF or ZIP file.'; err.hidden = false; return; }
+    if (file.size > DIGITAL_MAX) { err.textContent = 'That file is ' + Math.round(file.size / 1048576) + ' MB. The limit is 250 MB.'; err.hidden = false; return; }
+    uploading++;
+    try {
+      var status = await api('/api/digital-upload');
+      if (!status.configured) throw new Error("Private file storage isn't connected yet. Ask your web developer to add the Blob store in Vercel, then try again.");
+      prog.hidden = false; bar.style.width = '0'; txt.textContent = 'Starting…';
+      setStatus('Uploading ' + file.name + '…');
+      var mod = await import('/admin/vendor/blob-client.js');
+      var base = slug(art.title || art.id) + '-master';
+      var blob = await mod.upload('digital/' + base + '.' + ext, file, {
+        access: 'private',
+        handleUploadUrl: '/api/digital-upload',
+        multipart: file.size > 8 * 1048576,
+        onUploadProgress: function(p){ bar.style.width = p.percentage + '%'; txt.textContent = 'Uploading… ' + Math.round(p.percentage) + '%'; }
+      });
+      art.digitalFile = 'blob:' + blob.pathname;
+      art.digitalFileName = file.name.slice(0, 120);
+      markDirty(); render();
+      setStatus('File uploaded. Click Save & publish to make it the file customers receive.');
+    } catch (e) {
+      prog.hidden = true;
+      err.textContent = (e && e.message) || 'The upload failed. Please try again.';
+      err.hidden = false;
+      setStatus('File not uploaded — see the message under the file.', 'err');
+    } finally { uploading--; }
   }
 
   async function uploadAll(art, files, err){
@@ -545,17 +616,23 @@
   document.addEventListener('dragover', function(e){
     if (!hasFiles(e)) return;
     e.preventDefault(); // also stops the browser from navigating away if a file misses the drop zone
-    var strip = e.target.closest && e.target.closest('.photo-strip');
-    Array.prototype.forEach.call(document.querySelectorAll('.photo-strip.file-over'), function(el){ if (el !== strip) el.classList.remove('file-over'); });
+    var strip = e.target.closest && e.target.closest('.photo-strip, .digital-file');
+    Array.prototype.forEach.call(document.querySelectorAll('.file-over'), function(el){ if (el !== strip) el.classList.remove('file-over'); });
     if (strip) strip.classList.add('file-over');
   });
   document.addEventListener('dragleave', function(e){
-    if (!e.relatedTarget) Array.prototype.forEach.call(document.querySelectorAll('.photo-strip.file-over'), function(el){ el.classList.remove('file-over'); });
+    if (!e.relatedTarget) Array.prototype.forEach.call(document.querySelectorAll('.file-over'), function(el){ el.classList.remove('file-over'); });
   });
   document.addEventListener('drop', function(e){
     if (!hasFiles(e)) return;
     e.preventDefault();
-    Array.prototype.forEach.call(document.querySelectorAll('.photo-strip.file-over'), function(el){ el.classList.remove('file-over'); });
+    Array.prototype.forEach.call(document.querySelectorAll('.file-over'), function(el){ el.classList.remove('file-over'); });
+    var zone = e.target.closest && e.target.closest('.digital-file');
+    if (zone) {
+      var fz = findArt(zone);
+      if (fz && e.dataTransfer.files[0]) uploadDigital(fz.art, e.dataTransfer.files[0], fz.card);
+      return;
+    }
     var strip = e.target.closest && e.target.closest('.photo-strip');
     if (!strip) return;
     var files = Array.prototype.filter.call(e.dataTransfer.files, function(file){ return /^image\//.test(file.type); });
@@ -581,6 +658,12 @@
         var box = document.querySelector('[data-id="' + fc.art.id + '"] input[data-field="category"]'); if (box) box.focus(); }
       return;
     }
+    if (e.target.matches('[data-digital-file]')) {
+      var fdz = findArt(e.target), picked = e.target.files[0];
+      if (fdz && picked) uploadDigital(fdz.art, picked, fdz.card);
+      e.target.value = '';
+      return;
+    }
     if (!e.target.matches('[data-file]') || !e.target.files.length) return;
     var f = findArt(e.target);
     if (f) handleFiles(f.art, e.target.files, f.card);
@@ -591,9 +674,17 @@
     if (!btn) return;
     var list = state.content.artworks, action = btn.dataset.action;
     if (action === 'add') {
-      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', canvasPrice:'', printPrice:'', digitalPrice:'', digitalFile:'', category:'', images:[], sold:false, _new:true });
+      list.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', canvasPrice:'', printPrice:'', digitalPrice:'', digitalFile:'', digitalFileName:'', category:'', images:[], sold:false, _new:true });
       markDirty(); render();
       var first = document.querySelector('[data-field="title"]'); if (first) first.focus();
+      return;
+    }
+
+    if (action === 'remove-digital') {
+      var fd = findArt(btn); if (!fd) return;
+      if (!confirm('Remove the digital download file for "' + (fd.art.title || 'this piece') + '"? Customers will be told Luke will email the file until you upload a new one.')) return;
+      fd.art.digitalFile = ''; fd.art.digitalFileName = '';
+      markDirty(); render();
       return;
     }
 
@@ -654,7 +745,7 @@
         if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
         while (used[id]) id += 'x';
         used[id] = true;
-        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, canvasPrice:a.canvasPrice, printPrice:a.printPrice, digitalPrice:a.digitalPrice, digitalFile:a.digitalFile || '', category:canonCategory(a), images:a.images, sold:a.sold };
+        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, canvasPrice:a.canvasPrice, printPrice:a.printPrice, digitalPrice:a.digitalPrice, digitalFile:a.digitalFile || '', digitalFileName:a.digitalFileName || '', category:canonCategory(a), images:a.images, sold:a.sold };
       })
     };
     $('save').disabled = true;
@@ -708,7 +799,7 @@
   });
 
   window.addEventListener('beforeunload', function(e){
-    if (state.dirty) { e.preventDefault(); e.returnValue = ''; }
+    if (state.dirty || uploading) { e.preventDefault(); e.returnValue = ''; }
   });
 
   async function load(){
