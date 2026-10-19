@@ -354,6 +354,7 @@
   .checkout-panel .check input{ margin-top:3px; accent-color:var(--ink); }
   .checkout-shipping{ display:flex; flex-direction:column; gap:14px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
   .checkout-shipping[hidden]{ display:none; }
+  .checkout-fulfillment[hidden]{ display:none; }
   .checkout-pickup{ display:flex; flex-direction:column; gap:14px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
   .checkout-pickup[hidden]{ display:none; }
   .pickup-note{ font-size:.85rem; color:var(--ink-soft); }
@@ -503,7 +504,7 @@
   <div class="cart-lines" id="cart-lines"></div>
   <div class="cart-drawer-foot">
     <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
-    <p class="cart-tax-note">Sales tax and shipping are calculated at checkout.</p>
+    <p class="cart-tax-note" id="cart-tax-note">Sales tax and shipping are calculated at checkout.</p>
     <p class="color-note" id="cart-color-note" hidden><strong>Digital downloads:</strong> print-ready files in CMYK (not RGB), so they can look different on screen than when printed. This keeps your prints accurate and consistent.</p>
     <button type="button" class="btn btn-primary cart-checkout-btn" id="cart-checkout-btn">Checkout</button>
     <button type="button" class="btn btn-ghost-line" id="cart-continue-btn">Continue Shopping</button>
@@ -564,6 +565,8 @@
             </div>
           </div>
         </div>
+
+        <p class="ship-note" id="checkout-digital-only" hidden><strong>Digital download only — nothing ships.</strong> Your download link appears right after payment and is also emailed to you.</p>
 
         <p class="color-note" id="checkout-color-note" hidden><strong>About digital downloads:</strong> files use the CMYK color profile instead of RGB, so they will look different on your phone or computer screen than once printed. This is intentional, to keep your prints accurate and consistent in quality. Questions? <a href="mailto:{{contact_email}}">{{contact_email}}</a></p>
 
@@ -882,6 +885,7 @@
       });
       document.getElementById('cart-subtotal').textContent = fmtMoney(cartSubtotal());
       document.getElementById('cart-color-note').hidden = !cartHasDigital();
+      document.getElementById('cart-tax-note').textContent = cartHasPhysical() ? 'Sales tax and shipping are calculated at checkout.' : (cart.length ? 'Digital download only \u2014 nothing ships. Sales tax is calculated at checkout.' : 'Sales tax and shipping are calculated at checkout.');
     }
 
     var cartOverlay = document.getElementById('cart-overlay');
@@ -961,6 +965,7 @@
       var tt = computeTotals();
       document.getElementById('checkout-fulfillment').hidden = !tt.hasPhysical;
       document.getElementById('checkout-color-note').hidden = !cartHasDigital();
+      document.getElementById('checkout-digital-only').hidden = tt.hasPhysical || !cartHasDigital();
       document.getElementById('checkout-totals').innerHTML =
         '<div class="checkout-line-row"><span>Subtotal</span><span>' + fmtMoney(tt.subtotalC / 100) + '</span></div>' +
         (tt.shippingC ? '<div class="checkout-line-row"><span>Shipping</span><span>' + fmtMoney(tt.shippingC / 100) + '</span></div>' : '') +
