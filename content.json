@@ -64,7 +64,7 @@
         "images/black-bear.jpg",
         "images/black-bear-2.jpg"
       ],
-      "sold": true
+      "sold": false
     },
     {
       "id": "agave",
