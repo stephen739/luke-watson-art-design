@@ -51,7 +51,7 @@
   .tabs{ max-width:960px; margin:0 auto; padding:0 20px; display:flex; gap:6px; }
   .tab{ border:0; background:none; padding:12px 16px; font-weight:700; font-size:.82rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; }
   .tab[aria-selected="true"]{ color:var(--ink); border-bottom-color:var(--gold); }
-  main{ max-width:960px; margin:0 auto; padding:24px 20px 140px; display:flex; flex-direction:column; gap:20px; }
+  main{ max-width:960px; margin:0 auto; padding:24px 20px 190px; display:flex; flex-direction:column; gap:20px; }
 
   .intro{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
   .intro h2{ font-size:1.7rem; }
@@ -103,6 +103,11 @@
   .status{ flex:1; min-width:180px; font-size:.9rem; color:var(--ink-soft); }
   .status.ok{ color:#2C6B1F; font-weight:600; }
   .status.err{ color:var(--danger); font-weight:600; }
+  .notice{ width:calc(100% - 40px); max-width:920px; margin:10px auto 0; padding:10px 14px; border-radius:10px; display:flex; align-items:center; gap:10px 14px; flex-wrap:wrap; font-size:.9rem; line-height:1.4; }
+  .notice.warn{ background:#FFF4D6; border:1px solid #E6C25C; color:#4A3B05; }
+  .notice.err{ background:#FDECEA; border:1px solid #E5A29C; color:#7A1C15; font-weight:600; }
+  .notice-text{ flex:1; min-width:200px; }
+  .notice .btn{ white-space:nowrap; }
   .err-text{ color:var(--danger); font-size:.9rem; font-weight:600; }
   .help{ font-size:.85rem; }
 </style>
@@ -142,6 +147,7 @@
   <main id="main"></main>
 
   <div class="savebar">
+    <div class="notice" id="notice" role="alert" hidden><span class="notice-text" id="notice-text"></span><span id="notice-actions"></span></div>
     <div class="savebar-in">
       <p class="status" id="status" role="status" aria-live="polite">No changes yet.</p>
       <button class="btn btn-primary" id="save" type="button" disabled>Save &amp; publish</button>
@@ -203,10 +209,80 @@
     el.className = 'status' + (kind ? ' ' + kind : '');
   }
 
+  /* ---------- notice bar: stays on screen until the problem is dealt with ---------- */
+  var baseTitle = document.title;
+  var notice = { kind:null };
+  var lastSaveAt = 0;
+
+  function setNotice(kind, msg, actions){
+    var el = $('notice');
+    notice.kind = kind || null;
+    if (!kind) { el.hidden = true; return; }
+    el.className = 'notice ' + kind;
+    $('notice-text').textContent = msg;
+    var box = $('notice-actions');
+    box.innerHTML = '';
+    (actions || []).forEach(function(a){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn btn-small'; b.textContent = a.label;
+      b.addEventListener('click', a.fn);
+      box.appendChild(b);
+    });
+    el.hidden = false;
+  }
+
+  function syncDirtyUI(){
+    document.title = (state.dirty ? '● ' : '') + baseTitle;
+    if (state.dirty) {
+      if (notice.kind !== 'err') setNotice('warn', 'You have unpublished changes. They are NOT on the website until you click Save & publish.');
+    } else if (notice.kind === 'warn') {
+      setNotice(null);
+    }
+  }
+
+  function fail(msg, actions){
+    setStatus('Not published — see the message above.', 'err');
+    setNotice('err', msg, actions);
+  }
+
+  async function reloadLatest(){
+    if (state.dirty && !confirm('This throws away your unpublished edits and loads the latest published version. Continue?')) return;
+    setNotice(null);
+    await load();
+  }
+
+  function staleNotice(){
+    fail('The website was updated since you opened this page (for example a sale was recorded, or someone saved in another window). Your changes were NOT published. Copy anything you want to keep, then reload the latest version and redo your edits.',
+      [{ label:'Reload latest version', fn:reloadLatest }]);
+  }
+
+  // Quietly compares our copy with the live one. Clean copy: refresh it. Edited copy: warn before saving.
+  var checking = false;
+  var uploading = 0;
+  async function checkFresh(){
+    if (checking || uploading || !state.sha || $('app').hidden || Date.now() - lastSaveAt < 15000) return;
+    checking = true;
+    try {
+      var res = await fetch('/api/content', { credentials:'same-origin' });
+      if (!res.ok) return;
+      var data = await res.json();
+      if (!data.sha || data.sha === state.sha) return;
+      if (!state.dirty) {
+        state.content = data.content; state.sha = data.sha; previews = {};
+        render();
+        setStatus('Refreshed — the website had newer changes.');
+      } else if (notice.kind !== 'err') {
+        fail('The website was updated since you opened this page (for example a sale was recorded, or someone saved in another window). Saving now would be rejected. Copy anything you want to keep, then reload the latest version.',
+          [{ label:'Reload latest version', fn:reloadLatest }]);
+      }
+    } catch (e) {} finally { checking = false; }
+  }
+
   function markDirty(){
     state.dirty = true;
     $('save').disabled = false;
     setStatus('You have unpublished changes.');
+    syncDirtyUI();
   }
 
   async function api(path, method, body){
@@ -217,7 +293,10 @@
       body: body ? JSON.stringify(body) : undefined
     });
     var data = await res.json().catch(function(){ return {}; });
-    if (res.status === 401 && path !== '/api/login') { show('login'); }
+    if (res.status === 401 && path !== '/api/login') {
+      show('login');
+      if (state.dirty) { var le = $('login-error'); le.textContent = 'Your session expired. Sign in again — your unpublished edits are kept.'; le.hidden = false; }
+    }
     if (!res.ok) { var e = new Error(data.error || 'Something went wrong.'); e.status = res.status; throw e; }
     return data;
   }
@@ -355,6 +434,11 @@
   async function handleFiles(art, files, card){
     var err = card.querySelector('[data-err]');
     err.hidden = true;
+    uploading++;
+    try { await uploadAll(art, files, err); } finally { uploading--; }
+  }
+
+  async function uploadAll(art, files, err){
     for (var i = 0; i < files.length; i++) {
       setStatus('Uploading photo' + (files.length > 1 ? ' ' + (i + 1) + ' of ' + files.length : '') + '…');
       try {
@@ -459,9 +543,9 @@
   $('save').addEventListener('click', async function(){
     var list = state.content.artworks;
     for (var i = 0; i < list.length; i++) {
-      if (!list[i].title.trim()) { state.tab = 'art'; render(); setStatus('Every piece needs a title.', 'err'); return; }
-      if (!list[i].images.length) { state.tab = 'art'; render(); setStatus('"' + list[i].title + '" needs at least one photo.', 'err'); return; }
-      if (!list[i].canvasPrice.trim() || !list[i].printPrice.trim() || !list[i].digitalPrice.trim()) { state.tab = 'art'; render(); setStatus('"' + list[i].title + '" needs all three prices (canvas, print, digital).', 'err'); return; }
+      if (!list[i].title.trim()) { state.tab = 'art'; render(); fail('Every piece needs a title.'); return; }
+      if (!list[i].images.length) { state.tab = 'art'; render(); fail('"' + list[i].title + '" needs at least one photo.'); return; }
+      if (!list[i].canvasPrice.trim() || !list[i].printPrice.trim() || !list[i].digitalPrice.trim()) { state.tab = 'art'; render(); fail('"' + list[i].title + '" needs all three prices (canvas, print, digital).'); return; }
     }
     var used = {};
     var payload = {
@@ -475,22 +559,31 @@
       })
     };
     $('save').disabled = true;
+    setNotice(null);
     setStatus('Publishing…');
     try {
       var res = await api('/api/content', 'POST', { content:payload, sha:state.sha });
       state.sha = res.sha;
       state.content = res.content;
       state.dirty = false;
+      lastSaveAt = Date.now();
       previews = {};
       render();
+      syncDirtyUI();
+      setNotice(null);
       setStatus('Published! Your changes will be live on the website in about a minute.', 'ok');
     } catch (e) {
       $('save').disabled = false;
-      setStatus(e.message, 'err');
+      if (e.status === 409) staleNotice();
+      else if (e.status === 401) fail('Your session expired, so nothing was published. Sign in again — your edits are kept.');
+      else fail('NOT published: ' + e.message + ' Your edits are still on this page — click Save & publish to try again.');
+      syncDirtyUI();
     }
   });
 
   $('logout').addEventListener('click', async function(){
+    if (state.dirty && !confirm('You have unpublished changes that will be lost if you sign out. Sign out anyway?')) return;
+    state.dirty = false;
     try { await api('/api/logout', 'POST', {}); } catch (e) {}
     location.reload();
   });
@@ -501,7 +594,14 @@
     $('login-btn').disabled = true;
     try {
       await api('/api/login', 'POST', { password:$('pw').value });
-      await load();
+      if (state.dirty && state.content) {
+        $('pw').value = '';
+        show('app');
+        setNotice('warn', 'Signed back in. Your edits are still here — click Save & publish to publish them.');
+        checkFresh();
+      } else {
+        await load();
+      }
     } catch (ex) {
       err.textContent = ex.message; err.hidden = false;
     }
@@ -518,6 +618,8 @@
       state.content = res.content; state.sha = res.sha; state.dirty = false;
       previews = {};
       $('save').disabled = true;
+      setNotice(null);
+      document.title = baseTitle;
       setStatus('No changes yet.');
       render(); show('app');
     } catch (e) {
@@ -525,6 +627,10 @@
       else { show('login'); var err = $('login-error'); err.textContent = e.message; err.hidden = false; }
     }
   }
+
+  window.addEventListener('focus', checkFresh);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) checkFresh(); });
+  setInterval(function(){ if (!document.hidden) checkFresh(); }, 60000);
 
   (async function init(){
     try {
