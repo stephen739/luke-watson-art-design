@@ -412,7 +412,7 @@
     var legacy = has && a.digitalFile.indexOf('blob:') !== 0;
     var name = a.digitalFileName || (has ? a.digitalFile.split('/').pop() : '');
     return '<div class="wide digital-file" data-digital>' +
-      '<span class="photos-label">Digital download file <small style="text-transform:none;letter-spacing:0;font-weight:400;">Private — never shown on the website. This is the print-ready file customers receive after buying the Digital Download (JPG, PNG, TIFF, PDF or ZIP, up to 250 MB).</small></span>' +
+      '<span class="photos-label">Digital download file <small style="text-transform:none;letter-spacing:0;font-weight:400;">Private — never shown on the website. This is the print-ready file customers receive after buying the Digital Download (JPG, PNG, TIFF, PDF or ZIP, up to 250 MB). Export it in CMYK — customers are told the file is CMYK and may look different on screen than in print.</small></span>' +
       (has
         ? '<p class="digital-status ok">✔ <strong>' + esc(name) + '</strong>' + (legacy ? ' <small>(stored with the website)</small>' : '') + '</p>'
         : '<p class="digital-status warn">⚠ No file uploaded yet. Customers who buy the download will be told Luke will email it to them.</p>') +

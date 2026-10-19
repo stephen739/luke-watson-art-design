@@ -313,6 +313,9 @@
   .cart-drawer-foot{ padding:18px 20px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:10px; }
   .cart-subtotal{ display:flex; justify-content:space-between; font-weight:700; font-size:1.05rem; margin-bottom:4px; }
   .cart-tax-note{ font-size:.78rem; color:var(--ink-soft); margin:-4px 0 4px; }
+  .color-note{ font-size:.8rem; line-height:1.5; color:var(--ink-soft); background:var(--paper-soft); border:1px solid var(--line); border-radius:10px; padding:9px 12px; text-align:left; }
+  .color-note[hidden], .ship-note[hidden]{ display:none; }
+  .ship-note{ font-size:.92rem; line-height:1.5; background:var(--paper-soft); border:1px solid var(--line); border-radius:10px; padding:10px 14px; text-align:left; }
   .btn-ghost-line{ background:transparent; color:var(--ink); border:1px solid var(--line); }
   .btn-ghost-line:hover{ background:var(--paper-soft); }
 
@@ -501,6 +504,7 @@
   <div class="cart-drawer-foot">
     <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
     <p class="cart-tax-note">Sales tax and shipping are calculated at checkout.</p>
+    <p class="color-note" id="cart-color-note" hidden><strong>Digital downloads:</strong> print-ready files in CMYK (not RGB), so they can look different on screen than when printed. This keeps your prints accurate and consistent.</p>
     <button type="button" class="btn btn-primary cart-checkout-btn" id="cart-checkout-btn">Checkout</button>
     <button type="button" class="btn btn-ghost-line" id="cart-continue-btn">Continue Shopping</button>
   </div>
@@ -561,6 +565,8 @@
           </div>
         </div>
 
+        <p class="color-note" id="checkout-color-note" hidden><strong>About digital downloads:</strong> files use the CMYK color profile instead of RGB, so they will look different on your phone or computer screen than once printed. This is intentional, to keep your prints accurate and consistent in quality. Questions? <a href="mailto:{{contact_email}}">{{contact_email}}</a></p>
+
         <div class="field">
           <label>Card</label>
           <div id="card-container"></div>
@@ -574,7 +580,9 @@
       <div class="checkout-success" id="checkout-success" hidden>
         <h3>Thank you!</h3>
         <p id="checkout-success-text"></p>
+        <p class="ship-note" id="checkout-success-ship" hidden></p>
         <div id="checkout-downloads"></div>
+        <p class="color-note" id="checkout-success-color" hidden></p>
         <button type="button" class="btn btn-primary" id="checkout-done-btn">Done</button>
       </div>
     </div>
@@ -820,6 +828,7 @@
     function saveCart(){ try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){} }
     var cart = loadCart();
 
+    function cartHasDigital(){ return cart.some(function(l){ return l.option === 'digital'; }); }
     function cartHasPhysical(){ return cart.some(function(l){ return l.option === 'canvas' || l.option === 'print'; }); }
     function cartSubtotal(){ return cart.reduce(function(sum, l){ return sum + parsePrice(l.price) * l.qty; }, 0); }
 
@@ -872,6 +881,7 @@
         wrap.appendChild(row);
       });
       document.getElementById('cart-subtotal').textContent = fmtMoney(cartSubtotal());
+      document.getElementById('cart-color-note').hidden = !cartHasDigital();
     }
 
     var cartOverlay = document.getElementById('cart-overlay');
@@ -950,6 +960,7 @@
       }).join('');
       var tt = computeTotals();
       document.getElementById('checkout-fulfillment').hidden = !tt.hasPhysical;
+      document.getElementById('checkout-color-note').hidden = !cartHasDigital();
       document.getElementById('checkout-totals').innerHTML =
         '<div class="checkout-line-row"><span>Subtotal</span><span>' + fmtMoney(tt.subtotalC / 100) + '</span></div>' +
         (tt.shippingC ? '<div class="checkout-line-row"><span>Shipping</span><span>' + fmtMoney(tt.shippingC / 100) + '</span></div>' : '') +
@@ -1067,6 +1078,19 @@
         var text = 'A confirmation email is on its way to ' + email + '.';
         if(pending.length){ text += ' Luke will email you the file' + (pending.length > 1 ? 's' : '') + ' for ' + pending.map(function(d){ return d.title; }).join(', ') + ' directly.'; }
         document.getElementById('checkout-success-text').textContent = text;
+        var contact = res.data.contactEmail || '{{contact_email}}';
+        var shipEl = document.getElementById('checkout-success-ship');
+        if(res.data.delivery){
+          shipEl.innerHTML = '<strong>Estimated delivery: by ' + escHtml(res.data.delivery.deliverByLabel) + '</strong><br>' +
+            'That\u2019s ' + escHtml(res.data.delivery.businessDays) + ' business days from today. If your order hasn\u2019t arrived by then, please email Luke at ' +
+            '<a href="mailto:' + escHtml(contact) + '">' + escHtml(contact) + '</a>.';
+          shipEl.hidden = false;
+        } else { shipEl.hidden = true; }
+        var colorEl = document.getElementById('checkout-success-color');
+        if((res.data.downloads || []).length){
+          colorEl.innerHTML = '<strong>About your file\u2019s colors:</strong> digital download files use the CMYK color profile instead of RGB. They will look different on your phone or computer screen than they will once printed \u2014 this is intentional, to keep your prints accurate and consistent in quality. If you have any questions or concerns, don\u2019t hesitate to reach out at <a href="mailto:' + escHtml(contact) + '">' + escHtml(contact) + '</a>.';
+          colorEl.hidden = false;
+        } else { colorEl.hidden = true; }
         document.getElementById('checkout-downloads').innerHTML = downloads.map(function(d){
           return '<p><a href="' + d.url + '" download>Download ' + escHtml(d.title) + '</a></p>';
         }).join('');
