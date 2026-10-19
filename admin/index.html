@@ -91,6 +91,14 @@
   .photo-order button{ border:1px solid var(--line); background:var(--paper); border-radius:6px; font-size:.7rem; padding:2px 6px; cursor:pointer; }
   .photo-order button:disabled{ opacity:.35; cursor:not-allowed; }
   .photo-cover{ position:absolute; top:4px; left:4px; background:rgba(22,21,15,.7); color:#fff; font-size:.6rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:2px 6px; border-radius:999px; }
+  .photo{ cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+  .photo img{ -webkit-user-drag:none; pointer-events:none; }
+  .photo.dragging{ opacity:.3; cursor:grabbing; }
+  .photo.drop-target img{ outline:3px solid var(--gold); outline-offset:2px; }
+  .photo.drop-target::after{ content:attr(data-drop-label); position:absolute; left:0; right:0; bottom:30px; text-align:center; font-size:.62rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#fff; background:var(--ink); border-radius:999px; padding:2px 0; pointer-events:none; }
+  .photo-ghost{ position:fixed; z-index:50; pointer-events:none; width:84px; height:105px; object-fit:cover; border-radius:8px; border:2px solid var(--gold); box-shadow:0 10px 24px rgba(0,0,0,.28); transform:translate(-50%,-50%) rotate(-3deg); opacity:.92; }
+  .photo-strip.file-over{ outline:2px dashed var(--gold); outline-offset:6px; border-radius:8px; }
+  body.photo-dragging, body.photo-dragging *{ cursor:grabbing !important; }
   .photo-add{
     width:84px; height:105px; border-radius:8px; border:1px dashed var(--line); background:var(--soft);
     display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:var(--ink-soft); cursor:pointer;
@@ -355,7 +363,7 @@
             '<label>Digital Download price<input type="text" maxlength="20" data-field="digitalPrice" value="' + esc(a.digitalPrice) + '" placeholder="$15"></label>' +
             '<label class="check wide"><input type="checkbox" data-field="sold"' + (a.sold ? ' checked' : '') + '> Mark Original Canvas as Sold <small style="font-weight:400;">(prints and digital downloads stay available)</small></label>' +
             '<div class="wide">' +
-              '<span class="photos-label">Photos <small style="text-transform:none;letter-spacing:0;font-weight:400;">The first photo is the cover shown on the site. Visitors can click through the rest.</small></span>' +
+              '<span class="photos-label">Photos <small style="text-transform:none;letter-spacing:0;font-weight:400;">Drag photos to reorder them — the first photo is the cover shown on the site. You can also drop new photos right onto this row.</small></span>' +
               '<div class="photo-strip">' +
                 a.images.map(function(src, j){
                   return '<div class="photo" data-photo="' + j + '">' +
@@ -463,6 +471,96 @@
     if (!card) return null;
     return { card:card, art:state.content.artworks.find(function(a){ return a.id === card.dataset.id; }) };
   }
+
+  /* ---------- drag & drop: reorder photos (first = cover) and drop in new files ---------- */
+  var drag = null;
+
+  function dragTiles(strip){ return Array.prototype.slice.call(strip.querySelectorAll('.photo[data-photo]')); }
+
+  function dragTarget(d, x, y){
+    var tiles = dragTiles(d.strip), best = d.from, bestDist = Infinity;
+    tiles.forEach(function(t, idx){
+      var r = t.getBoundingClientRect();
+      var dist = Math.hypot(x - (r.left + r.width / 2), (y - (r.top + r.height / 2)) * 0.6);
+      if (dist < bestDist) { bestDist = dist; best = idx; }
+    });
+    return best;
+  }
+
+  function dragCleanup(){
+    if (!drag) return;
+    if (drag.ghost) drag.ghost.remove();
+    drag.tile.classList.remove('dragging');
+    dragTiles(drag.strip).forEach(function(t){ t.classList.remove('drop-target'); t.removeAttribute('data-drop-label'); });
+    document.body.classList.remove('photo-dragging');
+    try { drag.tile.releasePointerCapture(drag.id); } catch (e) {}
+    drag = null;
+  }
+
+  $('main').addEventListener('pointerdown', function(e){
+    var tile = e.target.closest && e.target.closest('.photo[data-photo]');
+    if (!tile || e.target.closest('button') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    drag = { tile:tile, strip:tile.parentNode, from:Number(tile.dataset.photo), to:Number(tile.dataset.photo), x:e.clientX, y:e.clientY, id:e.pointerId, active:false, ghost:null };
+  });
+
+  document.addEventListener('pointermove', function(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.active) {
+      if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+      drag.active = true;
+      try { drag.tile.setPointerCapture(drag.id); } catch (ex) {}
+      var ghost = drag.tile.querySelector('img').cloneNode(false);
+      ghost.className = 'photo-ghost'; ghost.removeAttribute('style');
+      document.body.appendChild(ghost); drag.ghost = ghost;
+      drag.tile.classList.add('dragging');
+      document.body.classList.add('photo-dragging');
+    }
+    e.preventDefault();
+    drag.ghost.style.left = e.clientX + 'px'; drag.ghost.style.top = e.clientY + 'px';
+    drag.to = dragTarget(drag, e.clientX, e.clientY);
+    dragTiles(drag.strip).forEach(function(t, idx){
+      var on = idx === drag.to && drag.to !== drag.from;
+      t.classList.toggle('drop-target', on);
+      if (on) t.setAttribute('data-drop-label', idx === 0 ? 'New cover' : 'Place here'); else t.removeAttribute('data-drop-label');
+    });
+  });
+
+  document.addEventListener('pointerup', function(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    var d = drag, moved = d.active && d.to !== d.from;
+    var f = moved ? findArt(d.strip) : null;
+    dragCleanup();
+    if (moved && f) {
+      f.art.images.splice(d.to, 0, f.art.images.splice(d.from, 1)[0]);
+      markDirty(); render();
+      setStatus(d.to === 0 ? 'New cover photo set. Click Save & publish to put it on the website.' : 'Photo moved. Click Save & publish to put the new order on the website.');
+    }
+  });
+  document.addEventListener('pointercancel', dragCleanup);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') dragCleanup(); });
+
+  // Dropping image files from the computer onto a piece's photo row uploads them.
+  function hasFiles(e){ return e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') !== -1; }
+  document.addEventListener('dragover', function(e){
+    if (!hasFiles(e)) return;
+    e.preventDefault(); // also stops the browser from navigating away if a file misses the drop zone
+    var strip = e.target.closest && e.target.closest('.photo-strip');
+    Array.prototype.forEach.call(document.querySelectorAll('.photo-strip.file-over'), function(el){ if (el !== strip) el.classList.remove('file-over'); });
+    if (strip) strip.classList.add('file-over');
+  });
+  document.addEventListener('dragleave', function(e){
+    if (!e.relatedTarget) Array.prototype.forEach.call(document.querySelectorAll('.photo-strip.file-over'), function(el){ el.classList.remove('file-over'); });
+  });
+  document.addEventListener('drop', function(e){
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    Array.prototype.forEach.call(document.querySelectorAll('.photo-strip.file-over'), function(el){ el.classList.remove('file-over'); });
+    var strip = e.target.closest && e.target.closest('.photo-strip');
+    if (!strip) return;
+    var files = Array.prototype.filter.call(e.dataTransfer.files, function(file){ return /^image\//.test(file.type); });
+    var f = findArt(strip);
+    if (f && files.length) handleFiles(f.art, files, f.card);
+  });
 
   $('main').addEventListener('input', function(e){
     var t = e.target;
