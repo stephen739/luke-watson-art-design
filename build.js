@@ -86,9 +86,9 @@ const blocks = {
     const image = `${siteUrl}/images/og-share.jpg`;
     const alt = `${t.site_title} — graffiti-style logo surrounded by spray-paint splatters`;
     return [
-      '<link rel="icon" href="/favicon.ico" sizes="48x48">',
-      '<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">',
-      '<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">',
+      '<link rel="icon" href="/favicon.ico?v=2" sizes="48x48">',
+      '<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=2">',
+      '<link rel="apple-touch-icon" href="/images/apple-touch-icon.png?v=2">',
       '<link rel="manifest" href="/site.webmanifest">',
       '<meta name="theme-color" content="#FFFFFF">',
       '<meta property="og:type" content="website">',
@@ -138,8 +138,8 @@ fs.writeFileSync(path.join(dist, 'site.webmanifest'), JSON.stringify({
   name: t.site_title,
   short_name: 'Luke Watson',
   icons: [
-    { src: '/images/favicon-192.png', sizes: '192x192', type: 'image/png' },
-    { src: '/images/favicon-512.png', sizes: '512x512', type: 'image/png' },
+    { src: '/images/favicon-192.png?v=2', sizes: '192x192', type: 'image/png' },
+    { src: '/images/favicon-512.png?v=2', sizes: '512x512', type: 'image/png' },
   ],
   theme_color: '#FFFFFF',
   background_color: '#FFFFFF',
