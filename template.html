@@ -83,8 +83,8 @@
   }
   .navlinks a:hover, .navlinks a.active{ color:var(--ink); }
   @media (max-width:480px){
-    .navlinks{ gap:12px; order:3; flex-basis:100%; }
-    .navlinks a{ font-size:.76rem; letter-spacing:.03em; }
+    .navlinks{ gap:9px; order:3; flex-basis:100%; }
+    .navlinks a{ font-size:.7rem; letter-spacing:.02em; }
     .nav .brand{ order:1; } .nav .cart-toggle{ order:2; }
   }
   .navlinks a.active::after, .navlinks a:hover::after{ width:100%; }
@@ -192,6 +192,18 @@
   .art-card[hidden]{ display:none; }
   #art .wrap, #photography .wrap{ max-width:1440px; }
   #photography{ border-top:1px solid var(--line); }
+  #design .wrap{ max-width:1440px; }
+  #design{ background:var(--paper-soft); border-block:1px solid var(--line); }
+  .feature-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:clamp(16px,2vw,28px); align-items:stretch; }
+  @media (max-width:1080px){ .feature-grid{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
+  @media (max-width:700px){ .feature-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; } }
+  .feature-card{ background:var(--paper); border-radius:18px; margin:0; }
+  .feature-card .art-visual{ aspect-ratio:1/1; background:#fff; }
+  .feature-card .art-visual img{ object-fit:contain; }
+  .feature-card .art-body{ padding:14px 16px 16px; gap:4px; }
+  .feature-card h3{ font-size:1.1rem; margin:0; }
+  .feature-card .art-meta{ font-size:.78rem; margin:0; }
+  @media (max-width:700px){ .feature-card .art-body{ padding:10px 12px 12px; } .feature-card h3{ font-size:.95rem; } }
   .art-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:clamp(20px,2.2vw,32px); align-items:start; }
   @media (max-width:1080px){ .art-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:clamp(24px,4vw,40px); } }
   @media (max-width:700px){ .art-grid{ grid-template-columns:1fr; } }
@@ -433,6 +445,7 @@
       <li><a href="#about" data-nav="about">About</a></li>
       <li><a href="#art" data-nav="art">Art</a></li>
       <li><a href="#photography" data-nav="photography">Photography</a></li>
+      <li><a href="#design" data-nav="design">Design</a></li>
       <li><a href="#contact" data-nav="contact">Contact</a></li>
     </ul>
     <button type="button" class="cart-toggle" id="cart-toggle" aria-label="Open cart">
@@ -611,6 +624,18 @@
   </div>
 </div>
 
+<section id="design">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">{{feat_eyebrow}}</p>
+      <h2>{{feat_heading}}</h2>
+      <p>{{feat_intro}}</p>
+    </div>
+    <!--FEATURED_FILTERS-->
+    <div class="feature-grid" id="feature-grid"><!--FEATURED--></div>
+  </div>
+</section>
+
 <section id="contact">
   <div class="wrap contact-grid">
     <div class="contact-side reveal">
@@ -709,7 +734,7 @@
 
     setTimeout(function(){ revealEls.forEach(function(el){ el.classList.add('is-visible'); }); }, 2500);
 
-    var sections = ['home','about','art','photography','contact'].map(function(id){ return document.getElementById(id); });
+    var sections = ['home','about','art','photography','design','contact'].map(function(id){ return document.getElementById(id); });
     var navLinks = Array.prototype.slice.call(document.querySelectorAll('.navlinks a'));
     // Scroll-spy: the active tab is the last section whose top has passed a reference line near the top
     // of the screen. (An "N% visible" test fails for tall sections like Art, which never reach it.)
@@ -790,6 +815,9 @@
       lbImg.src = lbState.images[lbState.index];
       lbImg.alt = lbState.title;
       lbCaption.textContent = lbState.title + (lbState.images.length > 1 ? ' — photo ' + (lbState.index + 1) + ' of ' + lbState.images.length : '');
+      var lbMulti = lbState.images.length > 1;
+      document.getElementById('lightbox-prev').style.display = lbMulti ? '' : 'none';
+      document.getElementById('lightbox-next').style.display = lbMulti ? '' : 'none';
     }
     function openLightbox(images, index, title, opener){
       lbState = { images: images, index: index, title: title, opener: opener || null };
@@ -809,8 +837,9 @@
 
     document.querySelectorAll('.art-visual[data-images]').forEach(function(visual){
       var title = visual.closest('.art-card').querySelector('h3').textContent;
-      visual.querySelector('.art-nav.prev').addEventListener('click', function(e){ e.stopPropagation(); stepCard(visual, -1); });
-      visual.querySelector('.art-nav.next').addEventListener('click', function(e){ e.stopPropagation(); stepCard(visual, 1); });
+      var prevBtn = visual.querySelector('.art-nav.prev'), nextBtn = visual.querySelector('.art-nav.next');
+      if(prevBtn) prevBtn.addEventListener('click', function(e){ e.stopPropagation(); stepCard(visual, -1); });
+      if(nextBtn) nextBtn.addEventListener('click', function(e){ e.stopPropagation(); stepCard(visual, 1); });
       visual.addEventListener('click', function(){
         openLightbox(cardImages(visual), cardIndex.get(visual) || 0, title, visual);
       });

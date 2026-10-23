@@ -163,6 +163,7 @@
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" id="tab-art" aria-selected="true" data-tab="art">Artwork</button>
       <button class="tab" role="tab" id="tab-photos" aria-selected="false" data-tab="photos">Photography</button>
+      <button class="tab" role="tab" id="tab-featured" aria-selected="false" data-tab="featured">Design work</button>
       <button class="tab" role="tab" id="tab-text" aria-selected="false" data-tab="text">Site text</button>
     </div>
   </header>
@@ -204,6 +205,12 @@
       ['photo_heading','Heading'],
       ['photo_intro','Intro paragraph','area'],
       ['photo_empty','Message shown until a photo is added','','Visitors see this while the Photography section is empty.']
+    ]},
+    { title:'Design work section', fields:[
+      ['feat_eyebrow','Small heading'],
+      ['feat_heading','Heading'],
+      ['feat_intro','Intro paragraph','area'],
+      ['feat_empty','Message shown when there is no design work','','Visitors see this if every item is removed.']
     ]},
     { title:'Checkout', fields:[
       ['sales_tax_rate','Sales tax rate (%)','','Charged on pickup orders, Texas shipments (shipping included) and digital-only orders. Orders shipped out of state are not taxed. Example: 8.25']
@@ -300,6 +307,7 @@
       if (!state.dirty) {
         state.content = data.content; state.sha = data.sha; previews = {};
         if (!state.content.photos) state.content.photos = [];
+        if (!state.content.featured) state.content.featured = [];
         render();
         setStatus('Refreshed — the website had newer changes.');
       } else if (notice.kind !== 'err') {
@@ -336,13 +344,15 @@
   function render(){
     $('tab-art').setAttribute('aria-selected', state.tab === 'art');
     $('tab-photos').setAttribute('aria-selected', state.tab === 'photos');
+    $('tab-featured').setAttribute('aria-selected', state.tab === 'featured');
     $('tab-text').setAttribute('aria-selected', state.tab === 'text');
-    $('main').innerHTML = state.tab === 'art' ? artHtml() : state.tab === 'photos' ? photoHtml() : textHtml();
+    $('main').innerHTML = state.tab === 'art' ? artHtml() : state.tab === 'photos' ? photoHtml() : state.tab === 'featured' ? featuredHtml() : textHtml();
   }
 
   // Artwork and photography each have their own category list (and filter buttons on the site).
   function isPhoto(art){ return (state.content.photos || []).indexOf(art) > -1; }
-  function listOf(art){ return isPhoto(art) ? state.content.photos : state.content.artworks; }
+  function isFeatured(art){ return (state.content.featured || []).indexOf(art) > -1; }
+  function listOf(art){ return isPhoto(art) ? state.content.photos : isFeatured(art) ? state.content.featured : state.content.artworks; }
 
   function allCategories(art){
     var seen = {}, out = [];
@@ -354,7 +364,7 @@
   }
 
   function categoryField(a){
-    var hint = '<small>Shows as a filter button above the ' + (isPhoto(a) ? 'photos' : 'artwork') + ' on the site. “No category” keeps it under “All” only.</small>';
+    var hint = '<small>Shows as a filter button above the ' + (isPhoto(a) ? 'photos' : isFeatured(a) ? 'design work' : 'artwork') + ' on the site. “No category” keeps it under “All” only.</small>';
     if (a._addingCategory) {
       return '<label>Category ' + hint +
         '<input type="text" maxlength="40" data-field="category" value="' + esc(a.category) + '" placeholder="Name your new category">' +
@@ -458,10 +468,45 @@
     return html;
   }
 
-  // Shared by Artwork and Photography: drag to reorder, first image is the cover, drop files to add.
+  function featuredHtml(){
+    var list = state.content.featured;
+    var html = '<div class="intro"><div><h2>Design work</h2><p class="help">Album art, logos and other design projects shown in a grid above Contact. Display only — nothing here is for sale. Tip: for logos, a square image on a white background looks best.</p></div>' +
+      '<button class="btn btn-primary" type="button" data-action="add-featured">+ Add new item</button></div>';
+    if (!list.length) html += '<div class="card"><p>No design work yet. Click “Add new item” to get started.</p></div>';
+    list.forEach(function(a, i){
+      var cover = a.images[0];
+      html += '<section class="card art" data-id="' + esc(a.id) + '">' +
+        '<div class="thumb-col">' +
+          (cover ? '<img class="thumb" src="' + esc(coverSrc(cover)) + '" alt="" style="object-fit:contain;background:#fff;">' : '<div class="thumb thumb-empty">Add an image</div>') +
+        '</div>' +
+        '<div>' +
+          (a._new ? '<span class="new-flag">New</span>' : '') +
+          '<div class="fields">' +
+            '<label class="wide">Title<input type="text" maxlength="120" data-field="title" value="' + esc(a.title) + '" placeholder="Album or client name"></label>' +
+            '<label class="wide">Credit (optional)<small>Shown under the title, e.g. the artist and producers, or “Logo design”.</small>' +
+              '<input type="text" maxlength="160" data-field="credit" value="' + esc(a.credit) + '" placeholder="Sideshow TYLT · Produced by …"></label>' +
+            categoryField(a) +
+            photosBlock(a) +
+          '</div>' +
+          '<div class="row-actions">' +
+            '<button class="btn btn-small" type="button" data-action="up"' + (i === 0 ? ' disabled' : '') + '>↑ Move up</button>' +
+            '<button class="btn btn-small" type="button" data-action="down"' + (i === list.length - 1 ? ' disabled' : '') + '>↓ Move down</button>' +
+            '<button class="btn btn-small btn-danger" type="button" data-action="remove">Remove item</button>' +
+          '</div>' +
+          '<p class="err-text" data-err hidden></p>' +
+        '</div>' +
+      '</section>';
+    });
+    return html;
+  }
+
+  // Shared by Artwork, Photography and Design work: drag to reorder, first image is the cover, drop files to add.
   function photosBlock(a){
     return '<div class="wide">' +
-              '<span class="photos-label">Photos <small style="text-transform:none;letter-spacing:0;font-weight:400;">Drag photos to reorder them — the first photo is the cover shown on the site. You can also drop new photos right onto this row.</small></span>' +
+              '<span class="photos-label">' + (isFeatured(a) ? 'Images' : 'Photos') + ' <small style="text-transform:none;letter-spacing:0;font-weight:400;">' +
+                (isFeatured(a)
+                  ? 'The first image is the tile shown on the site; any extra images appear when someone clicks through. Drag to reorder, or drop files right onto this row.'
+                  : 'Drag photos to reorder them — the first photo is the cover shown on the site. You can also drop new photos right onto this row.') + '</small></span>' +
               '<div class="photo-strip">' +
                 a.images.map(function(src, j){
                   return '<div class="photo" data-photo="' + j + '">' +
@@ -618,6 +663,7 @@
     var list = state.content.artworks;
     var art = list.find(function(a){ return a.id === card.dataset.id; });
     if (!art) { list = state.content.photos || []; art = list.find(function(a){ return a.id === card.dataset.id; }); }
+    if (!art) { list = state.content.featured || []; art = list.find(function(a){ return a.id === card.dataset.id; }); }
     return { card:card, art:art, list:list };
   }
 
@@ -769,6 +815,13 @@
       return;
     }
 
+    if (action === 'add-featured') {
+      state.content.featured.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', credit:'', category:'', images:[], _new:true });
+      markDirty(); render();
+      var firstFeat = document.querySelector('[data-field="title"]'); if (firstFeat) firstFeat.focus();
+      return;
+    }
+
     if (action === 'add-print' || action === 'remove-print') {
       var fpr = findArt(btn); if (!fpr) return;
       if (action === 'add-print') { fpr.art.prints.push(newPrint()); }
@@ -812,7 +865,7 @@
     if (action === 'up' && i > 0) { list.splice(i - 1, 0, list.splice(i, 1)[0]); }
     if (action === 'down' && i < list.length - 1) { list.splice(i + 1, 0, list.splice(i, 1)[0]); }
     if (action === 'remove') {
-      if (!confirm('Remove "' + (f.art.title || (isPhoto(f.art) ? 'this photo' : 'this piece')) + '" from the website?')) return;
+      if (!confirm('Remove "' + (f.art.title || (isPhoto(f.art) ? 'this photo' : isFeatured(f.art) ? 'this item' : 'this piece')) + '" from the website?')) return;
       list.splice(i, 1);
     }
     markDirty(); render();
@@ -850,9 +903,21 @@
         : '';
       if (problem) { state.tab = 'photos'; render(); fail(problem); return; }
     }
+    var featList = state.content.featured || [];
+    for (var fi = 0; fi < featList.length; fi++) {
+      if (!featList[fi].title.trim()) { state.tab = 'featured'; render(); fail('Every design item needs a title.'); return; }
+      if (!featList[fi].images.length) { state.tab = 'featured'; render(); fail('"' + featList[fi].title + '" needs at least one image.'); return; }
+    }
     var used = {};
     var payload = {
       text: state.content.text,
+      featured: featList.map(function(a){
+        var id = a.id;
+        if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
+        while (used[id]) id += 'x';
+        used[id] = true;
+        return { id:id, title:a.title, credit:a.credit || '', category:canonCategory(a), images:a.images };
+      }),
       photos: photoList.map(function(a){
         var id = a.id;
         if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
@@ -929,6 +994,7 @@
       var res = await api('/api/content');
       state.content = res.content; state.sha = res.sha; state.dirty = false;
       if (!state.content.photos) state.content.photos = [];
+      if (!state.content.featured) state.content.featured = [];
       previews = {};
       $('save').disabled = true;
       setNotice(null);

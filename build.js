@@ -73,6 +73,28 @@ function renderCard(a, options) {
       </article>`;
 }
 
+// Featured design work (album art, logos): display only. Uses the same card/visual classes as the shop
+// cards so the arrows and click-to-enlarge viewer work, but there is nothing to buy.
+function renderFeatured(f) {
+  const multi = f.images.length > 1;
+  const nav = multi
+    ? `
+          <button type="button" class="art-nav prev" aria-label="Previous image">‹</button>
+          <button type="button" class="art-nav next" aria-label="Next image">›</button>
+          <span class="art-count" data-count>1 / ${f.images.length}</span>`
+    : '';
+  return `
+      <figure class="art-card feature-card reveal" data-category="${esc(f.category || '')}" data-sold="false">
+        <div class="art-visual" data-images='${JSON.stringify(f.images).replace(/'/g, '&#39;')}' tabindex="0" role="button" aria-label="${esc(`View ${f.title} larger`)}">
+          <img class="art-photo" src="${esc(f.images[0])}" alt="${esc(f.credit ? `${f.title} — ${f.credit}` : f.title)}" loading="lazy">${nav}
+        </div>
+        <figcaption class="art-body">
+          <h3>${esc(f.title)}</h3>
+          ${f.credit ? `<p class="art-meta">${esc(f.credit)}</p>` : ''}
+        </figcaption>
+      </figure>`;
+}
+
 // Category filter chips shown above a grid (only when there are at least two categories).
 // Each bar controls only its own grid, named by data-target.
 function filterBar(items, target, withAvailable) {
@@ -101,6 +123,10 @@ const blocks = {
     ? content.photos.map(renderPhoto).join('\n')
     : `<p class="art-empty">${esc(t.photo_empty)}</p>`,
   '<!--PHOTO_FILTERS-->': filterBar(content.photos, 'photo-grid', false),
+  '<!--FEATURED-->': content.featured.length
+    ? content.featured.map(renderFeatured).join('\n')
+    : `<p class="art-empty">${esc(t.feat_empty)}</p>`,
+  '<!--FEATURED_FILTERS-->': filterBar(content.featured, 'feature-grid', false),
   '<!--NOTE-->': t.art_note
     ? `<div class="square-note reveal">\n      <span>🔒</span>\n      <span>${esc(t.art_note)}</span>\n    </div>`
     : '',
@@ -169,4 +195,4 @@ fs.writeFileSync(path.join(dist, 'site.webmanifest'), JSON.stringify({
   display: 'browser',
 }, null, 2));
 fs.cpSync(path.join(root, 'admin'), path.join(dist, 'admin'), { recursive: true });
-console.log(`Built site: ${content.artworks.length} artworks, ${content.photos.length} photos`);
+console.log(`Built site: ${content.artworks.length} artworks, ${content.photos.length} photos, ${content.featured.length} featured`);
