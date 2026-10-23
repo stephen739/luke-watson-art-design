@@ -3,7 +3,7 @@ const { sendEmail, configured: emailConfigured } = require('../lib/email');
 const { contactEmail } = require('../lib/recipient');
 const { deliverBy } = require('../lib/delivery');
 const { readLiveContent, writeLiveContent } = require('../lib/github');
-const { HttpError, priceCart, validateShipping, validatePickup, isEmail, makeDownloadToken, EMAIL_DOWNLOAD_TTL_MS } = require('../lib/checkout');
+const { HttpError, catalog, priceCart, validateShipping, validatePickup, isEmail, makeDownloadToken, EMAIL_DOWNLOAD_TTL_MS } = require('../lib/checkout');
 const { buyerEmail: buildBuyerEmail, lukeEmail: buildLukeEmail } = require('../lib/orderEmail');
 
 
@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
 
   let priced;
   try {
-    priced = priceCart(live.content.artworks, { items: body.items, fulfillment: body.fulfillment, shippingState: body.shipping?.state, taxRatePercent: live.content.text.sales_tax_rate });
+    priced = priceCart(catalog(live.content), { items: body.items, fulfillment: body.fulfillment, shippingState: body.shipping?.state, taxRatePercent: live.content.text.sales_tax_rate });
   } catch (e) {
     if (e instanceof HttpError) return res.status(e.status).json({ error: e.message });
     return res.status(500).json({ error: 'Something went wrong pricing your order.' });

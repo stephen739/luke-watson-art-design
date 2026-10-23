@@ -3,7 +3,7 @@ const path = require('path');
 const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
 const content = require('../content.json');
-const { verifyDownloadToken } = require('../lib/checkout');
+const { verifyDownloadToken, catalog } = require('../lib/checkout');
 
 const MIME = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.tif': 'image/tiff', '.tiff': 'image/tiff', '.pdf': 'application/pdf', '.zip': 'application/zip' };
 
@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
   const claim = verifyDownloadToken(req.query?.token);
   if (!claim) return res.status(403).json({ error: 'This download link has expired. Please contact Luke for a new one.' });
 
-  const artwork = content.artworks.find((a) => a.id === claim.artworkId);
+  const artwork = catalog(content).find((a) => a.id === claim.artworkId);
   if (!artwork?.digitalFile) return res.status(404).json({ error: 'File not found.' });
 
   // Masters uploaded through the portal live in private Blob storage and are streamed through here,

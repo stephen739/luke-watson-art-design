@@ -10,7 +10,7 @@ const t = content.text;
 
 const MAX_QTY = 10;
 
-function optionRow({ artworkId, title, option, label, price, sold, qtyId }) {
+function optionRow({ artworkId, title, option, variant, label, price, sold, qtyId }) {
   if (sold) {
     // Originals are one-of-one — once sold there's nothing left to add to cart for this option.
     return `
@@ -18,7 +18,7 @@ function optionRow({ artworkId, title, option, label, price, sold, qtyId }) {
             <span class="opt-info"><span class="opt-label">${esc(label)}</span><span class="opt-price opt-price-sold">${esc(price)} <span class="sold-note">(Sold)</span></span></span>
           </div>`;
   }
-  const button = `<button type="button" class="opt-buy add-to-cart" data-artwork="${esc(artworkId)}" data-option="${esc(option)}" data-title="${esc(title)}" data-label="${esc(label)}"${qtyId ? ` data-qty-id="${esc(qtyId)}"` : ''}>Add to Cart</button>`;
+  const button = `<button type="button" class="opt-buy add-to-cart" data-artwork="${esc(artworkId)}" data-option="${esc(option)}" data-title="${esc(title)}" data-label="${esc(label)}"${variant ? ` data-variant="${esc(variant)}"` : ''}${qtyId ? ` data-qty-id="${esc(qtyId)}"` : ''}>Add to Cart</button>`;
   const qty = qtyId
     ? `<label class="opt-qty-label" for="${esc(qtyId)}"><span class="sr-only">Quantity</span>
             <select class="opt-qty" id="${esc(qtyId)}">${Array.from({ length: MAX_QTY }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('')}</select></label>`
@@ -36,6 +36,21 @@ function renderArtwork(a) {
     optionRow({ artworkId: a.id, title: a.title, option: 'print', label: 'Print', price: a.printPrice, qtyId: `qty-${a.id}-print` }),
     optionRow({ artworkId: a.id, title: a.title, option: 'digital', label: 'Digital Download', price: a.digitalPrice }),
   ].join('');
+  return renderCard(a, options);
+}
+
+// Photographs: one print row per size (each priced separately), plus an optional digital download.
+function renderPhoto(p) {
+  const options = [
+    ...p.prints.map((pr) =>
+      optionRow({ artworkId: p.id, title: p.title, option: 'print', variant: pr.id, label: `Print — ${pr.size}`, price: pr.price, qtyId: `qty-${p.id}-${pr.id}` })
+    ),
+    p.digitalPrice ? optionRow({ artworkId: p.id, title: p.title, option: 'digital', label: 'Digital Download', price: p.digitalPrice }) : '',
+  ].join('');
+  return renderCard(p, options);
+}
+
+function renderCard(a, options) {
   const multi = a.images.length > 1;
   const nav = multi
     ? `
@@ -58,6 +73,17 @@ function renderArtwork(a) {
       </article>`;
 }
 
+// Category filter chips shown above a grid (only when there are at least two categories).
+// Each bar controls only its own grid, named by data-target.
+function filterBar(items, target, withAvailable) {
+  const cats = [...new Set(items.map((a) => a.category).filter(Boolean))];
+  if (cats.length < 2) return '';
+  const chip = (label, value, pressed) => `<button type="button" class="filter-chip" data-filter="${esc(value)}" aria-pressed="${pressed}">${esc(label)}</button>`;
+  return `<div class="art-filters reveal" role="group" aria-label="Filter" data-target="${esc(target)}">
+      ${chip('All', '', true)}${cats.map((c) => chip(c, c, false)).join('')}${withAvailable ? chip('Originals Available', '__available__', false) : ''}
+    </div>`;
+}
+
 let html = fs.readFileSync(path.join(root, 'template.html'), 'utf8');
 
 const blocks = {
@@ -70,14 +96,11 @@ const blocks = {
   '<!--ARTWORKS-->': content.artworks.length
     ? content.artworks.map(renderArtwork).join('\n')
     : '<p class="art-empty">New work is on the way — check back soon.</p>',
-  '<!--ART_FILTERS-->': (() => {
-    const cats = [...new Set(content.artworks.map((a) => a.category).filter(Boolean))];
-    if (cats.length < 2) return '';
-    const chip = (label, value, pressed) => `<button type="button" class="filter-chip" data-filter="${esc(value)}" aria-pressed="${pressed}">${esc(label)}</button>`;
-    return `<div class="art-filters reveal" role="group" aria-label="Filter artwork">
-      ${chip('All', '', true)}${cats.map((c) => chip(c, c, false)).join('')}${chip('Originals Available', '__available__', false)}
-    </div>`;
-  })(),
+  '<!--ART_FILTERS-->': filterBar(content.artworks, 'art-grid', true),
+  '<!--PHOTOS-->': content.photos.length
+    ? content.photos.map(renderPhoto).join('\n')
+    : `<p class="art-empty">${esc(t.photo_empty)}</p>`,
+  '<!--PHOTO_FILTERS-->': filterBar(content.photos, 'photo-grid', false),
   '<!--NOTE-->': t.art_note
     ? `<div class="square-note reveal">\n      <span>🔒</span>\n      <span>${esc(t.art_note)}</span>\n    </div>`
     : '',
@@ -146,4 +169,4 @@ fs.writeFileSync(path.join(dist, 'site.webmanifest'), JSON.stringify({
   display: 'browser',
 }, null, 2));
 fs.cpSync(path.join(root, 'admin'), path.join(dist, 'admin'), { recursive: true });
-console.log(`Built site: ${content.artworks.length} artworks`);
+console.log(`Built site: ${content.artworks.length} artworks, ${content.photos.length} photos`);

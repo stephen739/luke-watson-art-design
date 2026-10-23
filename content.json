@@ -23,6 +23,10 @@
     "art_heading": "Fresh off the easel",
     "art_intro": "Originals are one of one — reach out below for pricing and availability.",
     "art_note": "",
+    "photo_eyebrow": "Photography",
+    "photo_heading": "Prints & digital downloads",
+    "photo_intro": "Photographs by Luke, available as prints or instant digital downloads.",
+    "photo_empty": "New photography is on the way — check back soon.",
     "sales_tax_rate": "8.25",
     "contact_eyebrow": "Get in touch",
     "contact_heading_top": "Let's make",
@@ -117,5 +121,6 @@
       ],
       "sold": false
     }
-  ]
+  ],
+  "photos": []
 }

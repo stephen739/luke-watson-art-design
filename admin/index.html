@@ -98,6 +98,9 @@
   .photo.drop-target::after{ content:attr(data-drop-label); position:absolute; left:0; right:0; bottom:30px; text-align:center; font-size:.62rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#fff; background:var(--ink); border-radius:999px; padding:2px 0; pointer-events:none; }
   .photo-ghost{ position:fixed; z-index:50; pointer-events:none; width:84px; height:105px; object-fit:cover; border-radius:8px; border:2px solid var(--gold); box-shadow:0 10px 24px rgba(0,0,0,.28); transform:translate(-50%,-50%) rotate(-3deg); opacity:.92; }
   .photo-strip.file-over, .digital-file.file-over{ outline:2px dashed var(--gold); outline-offset:6px; border-radius:8px; }
+  .print-sizes{ display:flex; flex-direction:column; gap:8px; }
+  .print-row{ display:grid; grid-template-columns:minmax(0,1fr) 140px auto; gap:10px; align-items:end; }
+  @media (max-width:560px){ .print-row{ grid-template-columns:1fr 110px; } .print-row .btn{ grid-column:1/-1; justify-self:start; } }
   .digital-file{ border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--soft); }
   .digital-file .photos-label{ margin-bottom:6px; }
   .digital-status{ margin:6px 0 10px; font-size:.92rem; word-break:break-all; }
@@ -159,6 +162,7 @@
     </div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" id="tab-art" aria-selected="true" data-tab="art">Artwork</button>
+      <button class="tab" role="tab" id="tab-photos" aria-selected="false" data-tab="photos">Photography</button>
       <button class="tab" role="tab" id="tab-text" aria-selected="false" data-tab="text">Site text</button>
     </div>
   </header>
@@ -194,6 +198,12 @@
       ['art_heading','Big heading'],
       ['art_intro','Intro paragraph','area'],
       ['art_note','Note under the artwork','area','Leave blank to hide this note completely.']
+    ]},
+    { title:'Photography section', fields:[
+      ['photo_eyebrow','Small heading'],
+      ['photo_heading','Heading'],
+      ['photo_intro','Intro paragraph','area'],
+      ['photo_empty','Message shown until a photo is added','','Visitors see this while the Photography section is empty.']
     ]},
     { title:'Checkout', fields:[
       ['sales_tax_rate','Sales tax rate (%)','','Charged on pickup orders, Texas shipments (shipping included) and digital-only orders. Orders shipped out of state are not taxed. Example: 8.25']
@@ -289,6 +299,7 @@
       if (!data.sha || data.sha === state.sha) return;
       if (!state.dirty) {
         state.content = data.content; state.sha = data.sha; previews = {};
+        if (!state.content.photos) state.content.photos = [];
         render();
         setStatus('Refreshed — the website had newer changes.');
       } else if (notice.kind !== 'err') {
@@ -324,13 +335,18 @@
   /* ---------- rendering ---------- */
   function render(){
     $('tab-art').setAttribute('aria-selected', state.tab === 'art');
+    $('tab-photos').setAttribute('aria-selected', state.tab === 'photos');
     $('tab-text').setAttribute('aria-selected', state.tab === 'text');
-    $('main').innerHTML = state.tab === 'art' ? artHtml() : textHtml();
+    $('main').innerHTML = state.tab === 'art' ? artHtml() : state.tab === 'photos' ? photoHtml() : textHtml();
   }
 
-  function allCategories(){
+  // Artwork and photography each have their own category list (and filter buttons on the site).
+  function isPhoto(art){ return (state.content.photos || []).indexOf(art) > -1; }
+  function listOf(art){ return isPhoto(art) ? state.content.photos : state.content.artworks; }
+
+  function allCategories(art){
     var seen = {}, out = [];
-    state.content.artworks.forEach(function(a){
+    listOf(art).forEach(function(a){
       var c = (a.category || '').trim();
       if (c && !seen[c.toLowerCase()]) { seen[c.toLowerCase()] = true; out.push(c); }
     });
@@ -338,13 +354,13 @@
   }
 
   function categoryField(a){
-    var hint = '<small>Shows as a filter button above the artwork on the site. “No category” keeps the piece under “All” only.</small>';
+    var hint = '<small>Shows as a filter button above the ' + (isPhoto(a) ? 'photos' : 'artwork') + ' on the site. “No category” keeps it under “All” only.</small>';
     if (a._addingCategory) {
       return '<label>Category ' + hint +
         '<input type="text" maxlength="40" data-field="category" value="' + esc(a.category) + '" placeholder="Name your new category">' +
         '<button type="button" class="btn btn-small" data-action="cancel-category" style="align-self:flex-start;margin-top:6px;">Cancel</button></label>';
     }
-    var cats = allCategories();
+    var cats = allCategories(a);
     var cur = (a.category || '').trim();
     var opts = '<option value=""' + (cur ? '' : ' selected') + '>No category</option>' +
       cats.map(function(c){ return '<option value="' + esc(c) + '"' + (c.toLowerCase() === cur.toLowerCase() ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') +
@@ -374,7 +390,77 @@
             '<label>Print price<input type="text" maxlength="20" data-field="printPrice" value="' + esc(a.printPrice) + '" placeholder="$35"></label>' +
             '<label>Digital Download price<input type="text" maxlength="20" data-field="digitalPrice" value="' + esc(a.digitalPrice) + '" placeholder="$15"></label>' +
             '<label class="check wide"><input type="checkbox" data-field="sold"' + (a.sold ? ' checked' : '') + '> Mark Original Canvas as Sold <small style="font-weight:400;">(prints and digital downloads stay available)</small></label>' +
-            '<div class="wide">' +
+            photosBlock(a) +
+            digitalBlock(a) +
+          '</div>' +
+          '<div class="row-actions">' +
+            '<button class="btn btn-small" type="button" data-action="up"' + (i === 0 ? ' disabled' : '') + '>↑ Move up</button>' +
+            '<button class="btn btn-small" type="button" data-action="down"' + (i === list.length - 1 ? ' disabled' : '') + '>↓ Move down</button>' +
+            '<button class="btn btn-small btn-danger" type="button" data-action="remove">Remove piece</button>' +
+          '</div>' +
+          '<p class="err-text" data-err hidden></p>' +
+        '</div>' +
+      '</section>';
+    });
+    return html;
+  }
+
+  function newPrint(){ return { id:'p' + Math.random().toString(36).slice(2, 7), size:'', price:'' }; }
+
+  function printsBlock(a){
+    var rows = (a.prints || []).map(function(pr, j){
+      return '<div class="print-row" data-print="' + j + '">' +
+        '<label>Size<input type="text" maxlength="60" data-print-field="size" value="' + esc(pr.size) + '" placeholder="8&quot; x 10&quot;"></label>' +
+        '<label>Price<input type="text" maxlength="20" data-print-field="price" value="' + esc(pr.price) + '" placeholder="$25"></label>' +
+        '<button type="button" class="btn btn-small btn-danger" data-action="remove-print">Remove</button>' +
+      '</div>';
+    }).join('');
+    return '<div class="wide print-sizes">' +
+      '<span class="photos-label">Print sizes &amp; prices <small style="text-transform:none;letter-spacing:0;font-weight:400;">Each size shows on the site as its own option with its own price. Add as many sizes as you offer.</small></span>' +
+      (rows || '<p class="help" style="margin:6px 0 10px;">No print sizes yet — add one below, or sell this photo as a digital download only.</p>') +
+      '<button type="button" class="btn btn-small" data-action="add-print">+ Add a print size</button>' +
+    '</div>';
+  }
+
+  function photoHtml(){
+    var list = state.content.photos;
+    var html = '<div class="intro"><div><h2>Photography</h2><p class="help">Photos for sale appear on the website in this order, in their own section below the artwork. Customers can buy prints (each size priced separately) and/or a digital download.</p></div>' +
+      '<button class="btn btn-primary" type="button" data-action="add-photo">+ Add new photo</button></div>';
+    if (!list.length) html += '<div class="card"><p>No photography yet. Click “Add new photo” to get started. Until then, visitors see a “new photography is on the way” message in that section.</p></div>';
+    list.forEach(function(a, i){
+      var cover = a.images[0];
+      html += '<section class="card art" data-id="' + esc(a.id) + '">' +
+        '<div class="thumb-col">' +
+          (cover ? '<img class="thumb" src="' + esc(coverSrc(cover)) + '" alt="">' : '<div class="thumb thumb-empty">Add a photo</div>') +
+        '</div>' +
+        '<div>' +
+          (a._new ? '<span class="new-flag">New</span>' : '') +
+          '<div class="fields">' +
+            '<label class="wide">Title<input type="text" maxlength="120" data-field="title" value="' + esc(a.title) + '"></label>' +
+            '<label class="wide">Description<textarea maxlength="500" data-field="blurb">' + esc(a.blurb) + '</textarea></label>' +
+            categoryField(a) +
+            '<label>Details (optional)<input type="text" maxlength="200" data-field="meta" value="' + esc(a.meta) + '" placeholder="Palo Duro Canyon · Fujifilm X-T4"></label>' +
+            printsBlock(a) +
+            '<label>Digital Download price (optional)<small>Leave blank to not sell a digital download. If you set a price, upload the file below.</small>' +
+              '<input type="text" maxlength="20" data-field="digitalPrice" value="' + esc(a.digitalPrice) + '" placeholder="$15"></label>' +
+            photosBlock(a) +
+            digitalBlock(a) +
+          '</div>' +
+          '<div class="row-actions">' +
+            '<button class="btn btn-small" type="button" data-action="up"' + (i === 0 ? ' disabled' : '') + '>↑ Move up</button>' +
+            '<button class="btn btn-small" type="button" data-action="down"' + (i === list.length - 1 ? ' disabled' : '') + '>↓ Move down</button>' +
+            '<button class="btn btn-small btn-danger" type="button" data-action="remove">Remove photo</button>' +
+          '</div>' +
+          '<p class="err-text" data-err hidden></p>' +
+        '</div>' +
+      '</section>';
+    });
+    return html;
+  }
+
+  // Shared by Artwork and Photography: drag to reorder, first image is the cover, drop files to add.
+  function photosBlock(a){
+    return '<div class="wide">' +
               '<span class="photos-label">Photos <small style="text-transform:none;letter-spacing:0;font-weight:400;">Drag photos to reorder them — the first photo is the cover shown on the site. You can also drop new photos right onto this row.</small></span>' +
               '<div class="photo-strip">' +
                 a.images.map(function(src, j){
@@ -392,19 +478,7 @@
                   '<input type="file" accept="image/*" data-file multiple style="display:none">' +
                 '</label>' +
               '</div>' +
-            '</div>' +
-            digitalBlock(a) +
-          '</div>' +
-          '<div class="row-actions">' +
-            '<button class="btn btn-small" type="button" data-action="up"' + (i === 0 ? ' disabled' : '') + '>↑ Move up</button>' +
-            '<button class="btn btn-small" type="button" data-action="down"' + (i === list.length - 1 ? ' disabled' : '') + '>↓ Move down</button>' +
-            '<button class="btn btn-small btn-danger" type="button" data-action="remove">Remove piece</button>' +
-          '</div>' +
-          '<p class="err-text" data-err hidden></p>' +
-        '</div>' +
-      '</section>';
-    });
-    return html;
+            '</div>';
   }
 
   function digitalBlock(a){
@@ -541,7 +615,10 @@
   function findArt(el){
     var card = el.closest('[data-id]');
     if (!card) return null;
-    return { card:card, art:state.content.artworks.find(function(a){ return a.id === card.dataset.id; }) };
+    var list = state.content.artworks;
+    var art = list.find(function(a){ return a.id === card.dataset.id; });
+    if (!art) { list = state.content.photos || []; art = list.find(function(a){ return a.id === card.dataset.id; }); }
+    return { card:card, art:art, list:list };
   }
 
   /* ---------- drag & drop: reorder photos (first = cover) and drop in new files ---------- */
@@ -643,6 +720,11 @@
   $('main').addEventListener('input', function(e){
     var t = e.target;
     if (t.dataset.text) { state.content.text[t.dataset.text] = t.value; markDirty(); return; }
+    if (t.dataset.printField) {
+      var fp = findArt(t), row = t.closest('[data-print]');
+      if (fp && row && fp.art.prints[Number(row.dataset.print)]) { fp.art.prints[Number(row.dataset.print)][t.dataset.printField] = t.value; markDirty(); }
+      return;
+    }
     if (t.dataset.field) {
       if (t.dataset.field === 'category' && t.value === '__new__') return;
       var f = findArt(t); if (!f) return;
@@ -680,6 +762,25 @@
       return;
     }
 
+    if (action === 'add-photo') {
+      state.content.photos.unshift({ id:'new-' + Math.random().toString(36).slice(2, 8), title:'', blurb:'', meta:'', category:'', images:[], prints:[newPrint()], digitalPrice:'', digitalFile:'', digitalFileName:'', _new:true });
+      markDirty(); render();
+      var firstPhoto = document.querySelector('[data-field="title"]'); if (firstPhoto) firstPhoto.focus();
+      return;
+    }
+
+    if (action === 'add-print' || action === 'remove-print') {
+      var fpr = findArt(btn); if (!fpr) return;
+      if (action === 'add-print') { fpr.art.prints.push(newPrint()); }
+      else { fpr.art.prints.splice(Number(btn.closest('[data-print]').dataset.print), 1); }
+      markDirty(); render();
+      if (action === 'add-print') {
+        var rows = document.querySelectorAll('[data-id="' + fpr.art.id + '"] [data-print-field="size"]');
+        if (rows.length) rows[rows.length - 1].focus();
+      }
+      return;
+    }
+
     if (action === 'remove-digital') {
       var fd = findArt(btn); if (!fd) return;
       if (!confirm('Remove the digital download file for "' + (fd.art.title || 'this piece') + '"? Customers will be told Luke will email the file until you upload a new one.')) return;
@@ -706,11 +807,12 @@
     }
 
     var f = findArt(btn); if (!f) return;
+    list = f.list;
     var i = list.indexOf(f.art);
     if (action === 'up' && i > 0) { list.splice(i - 1, 0, list.splice(i, 1)[0]); }
     if (action === 'down' && i < list.length - 1) { list.splice(i + 1, 0, list.splice(i, 1)[0]); }
     if (action === 'remove') {
-      if (!confirm('Remove "' + (f.art.title || 'this piece') + '" from the website?')) return;
+      if (!confirm('Remove "' + (f.art.title || (isPhoto(f.art) ? 'this photo' : 'this piece')) + '" from the website?')) return;
       list.splice(i, 1);
     }
     markDirty(); render();
@@ -724,7 +826,7 @@
   function canonCategory(art){
     var c = String(art.category || '').trim().replace(/\s+/g, ' ');
     if (!c) return '';
-    var match = state.content.artworks.filter(function(o){ return o !== art && (o.category || '').trim().toLowerCase() === c.toLowerCase(); })[0];
+    var match = listOf(art).filter(function(o){ return o !== art && (o.category || '').trim().toLowerCase() === c.toLowerCase(); })[0];
     return match ? match.category.trim() : c;
   }
 
@@ -737,9 +839,29 @@
       if (!list[i].images.length) { state.tab = 'art'; render(); fail('"' + list[i].title + '" needs at least one photo.'); return; }
       if (!list[i].canvasPrice.trim() || !list[i].printPrice.trim() || !list[i].digitalPrice.trim()) { state.tab = 'art'; render(); fail('"' + list[i].title + '" needs all three prices (canvas, print, digital).'); return; }
     }
+    var photoList = state.content.photos || [];
+    for (var pi = 0; pi < photoList.length; pi++) {
+      var ph = photoList[pi], label = '"' + (ph.title || 'A photo').trim() + '"';
+      var rowsUsed = (ph.prints || []).filter(function(r){ return r.size.trim() || r.price.trim(); });
+      var problem = !ph.title.trim() ? 'Every photo needs a title.'
+        : !ph.images.length ? label + ' needs at least one image.'
+        : rowsUsed.some(function(r){ return !r.size.trim() || !r.price.trim(); }) ? label + ': every print size needs both a size and a price.'
+        : (!rowsUsed.length && !String(ph.digitalPrice || '').trim()) ? label + ' needs at least one print size or a Digital Download price.'
+        : '';
+      if (problem) { state.tab = 'photos'; render(); fail(problem); return; }
+    }
     var used = {};
     var payload = {
       text: state.content.text,
+      photos: photoList.map(function(a){
+        var id = a.id;
+        if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
+        while (used[id]) id += 'x';
+        used[id] = true;
+        var rows = (a.prints || []).filter(function(r){ return r.size.trim() || r.price.trim(); })
+          .map(function(r){ return { id:r.id, size:r.size, price:r.price }; });
+        return { id:id, title:a.title, blurb:a.blurb, meta:a.meta, category:canonCategory(a), images:a.images, prints:rows, digitalPrice:a.digitalPrice || '', digitalFile:a.digitalFile || '', digitalFileName:a.digitalFileName || '' };
+      }),
       artworks: list.map(function(a){
         var id = a.id;
         if (a._new) { id = slug(a.title) + '-' + Math.random().toString(36).slice(2, 5); }
@@ -806,6 +928,7 @@
     try {
       var res = await api('/api/content');
       state.content = res.content; state.sha = res.sha; state.dirty = false;
+      if (!state.content.photos) state.content.photos = [];
       previews = {};
       $('save').disabled = true;
       setNotice(null);

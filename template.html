@@ -82,6 +82,11 @@
     background:var(--ink); transition:width .25s ease;
   }
   .navlinks a:hover, .navlinks a.active{ color:var(--ink); }
+  @media (max-width:480px){
+    .navlinks{ gap:12px; order:3; flex-basis:100%; }
+    .navlinks a{ font-size:.76rem; letter-spacing:.03em; }
+    .nav .brand{ order:1; } .nav .cart-toggle{ order:2; }
+  }
   .navlinks a.active::after, .navlinks a:hover::after{ width:100%; }
 
   .cart-toggle{
@@ -185,7 +190,8 @@
   .filter-chip:hover{ border-color:var(--ink); color:var(--ink); }
   .filter-chip[aria-pressed="true"]{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
   .art-card[hidden]{ display:none; }
-  #art .wrap{ max-width:1440px; }
+  #art .wrap, #photography .wrap{ max-width:1440px; }
+  #photography{ border-top:1px solid var(--line); }
   .art-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:clamp(20px,2.2vw,32px); align-items:start; }
   @media (max-width:1080px){ .art-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:clamp(24px,4vw,40px); } }
   @media (max-width:700px){ .art-grid{ grid-template-columns:1fr; } }
@@ -426,6 +432,7 @@
       <li><a href="#home" data-nav="home">Home</a></li>
       <li><a href="#about" data-nav="about">About</a></li>
       <li><a href="#art" data-nav="art">Art</a></li>
+      <li><a href="#photography" data-nav="photography">Photography</a></li>
       <li><a href="#contact" data-nav="contact">Contact</a></li>
     </ul>
     <button type="button" class="cart-toggle" id="cart-toggle" aria-label="Open cart">
@@ -478,9 +485,21 @@
       <p>{{art_intro}}</p>
     </div>
     <!--ART_FILTERS-->
-    <div class="art-grid"><!--ARTWORKS--></div>
+    <div class="art-grid" id="art-grid"><!--ARTWORKS--></div>
 
     <!--NOTE-->
+  </div>
+</section>
+
+<section id="photography">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">{{photo_eyebrow}}</p>
+      <h2>{{photo_heading}}</h2>
+      <p>{{photo_intro}}</p>
+    </div>
+    <!--PHOTO_FILTERS-->
+    <div class="art-grid" id="photo-grid"><!--PHOTOS--></div>
   </div>
 </section>
 
@@ -690,7 +709,7 @@
 
     setTimeout(function(){ revealEls.forEach(function(el){ el.classList.add('is-visible'); }); }, 2500);
 
-    var sections = ['home','about','art','contact'].map(function(id){ return document.getElementById(id); });
+    var sections = ['home','about','art','photography','contact'].map(function(id){ return document.getElementById(id); });
     var navLinks = Array.prototype.slice.call(document.querySelectorAll('.navlinks a'));
     // Scroll-spy: the active tab is the last section whose top has passed a reference line near the top
     // of the screen. (An "N% visible" test fails for tall sections like Art, which never reach it.)
@@ -811,21 +830,23 @@
       if(e.key === 'ArrowRight') stepLightbox(1);
     });
 
-    /* ---------- artwork filters ---------- */
-    var chips = document.querySelectorAll('.filter-chip');
-    if(chips.length){
+    /* ---------- category filters (each bar only controls its own grid) ---------- */
+    document.querySelectorAll('.art-filters').forEach(function(bar){
+      var grid = document.getElementById(bar.dataset.target);
+      if(!grid) return;
+      var chips = bar.querySelectorAll('.filter-chip');
       chips.forEach(function(chip){
         chip.addEventListener('click', function(){
           var value = chip.dataset.filter;
           chips.forEach(function(c){ c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
-          document.querySelectorAll('.art-card').forEach(function(card){
+          grid.querySelectorAll('.art-card').forEach(function(card){
             var show = !value || (value === '__available__' ? card.dataset.sold !== 'true' : card.dataset.category === value);
             card.hidden = !show;
             if(show) card.classList.add('is-visible');
           });
         });
       });
-    }
+    });
 
     /* ---------- Cart ---------- */
     var CART_KEY = 'lw_cart_v1';
@@ -842,7 +863,7 @@
     function cartSubtotal(){ return cart.reduce(function(sum, l){ return sum + parsePrice(l.price) * l.qty; }, 0); }
 
     function addToCart(item){
-      var existing = cart.filter(function(l){ return l.artworkId === item.artworkId && l.option === item.option; })[0];
+      var existing = cart.filter(function(l){ return l.artworkId === item.artworkId && l.option === item.option && (l.variant || '') === (item.variant || ''); })[0];
       if(existing){
         if(item.option === 'print'){ existing.qty = Math.min(10, existing.qty + item.qty); }
       } else {
@@ -852,8 +873,8 @@
       renderCartBadge();
       renderCartDrawer();
     }
-    function removeFromCart(artworkId, option){
-      cart = cart.filter(function(l){ return !(l.artworkId === artworkId && l.option === option); });
+    function removeFromCart(artworkId, option, variant){
+      cart = cart.filter(function(l){ return !(l.artworkId === artworkId && l.option === option && (l.variant || '') === (variant || '')); });
       saveCart();
       renderCartBadge();
       renderCartDrawer();
@@ -886,7 +907,7 @@
             '<span class="cart-line-price">' + fmtMoney(parsePrice(l.price) * l.qty) + '</span>' +
           '</div>' +
           '<button type="button" class="cart-line-remove" aria-label="Remove ' + escHtml(l.title) + '">✕</button>';
-        row.querySelector('.cart-line-remove').addEventListener('click', function(){ removeFromCart(l.artworkId, l.option); });
+        row.querySelector('.cart-line-remove').addEventListener('click', function(){ removeFromCart(l.artworkId, l.option, l.variant); });
         wrap.appendChild(row);
       });
       document.getElementById('cart-subtotal').textContent = fmtMoney(cartSubtotal());
@@ -926,7 +947,7 @@
 
     document.querySelectorAll('.add-to-cart').forEach(function(btn){
       btn.addEventListener('click', function(){
-        var artworkId = btn.dataset.artwork, option = btn.dataset.option, title = btn.dataset.title, label = btn.dataset.label;
+        var artworkId = btn.dataset.artwork, option = btn.dataset.option, title = btn.dataset.title, label = btn.dataset.label, variant = btn.dataset.variant || '';
         var priceEl = btn.closest('.art-option').querySelector('.opt-price');
         var price = priceEl ? priceEl.textContent : '';
         var qty = 1;
@@ -936,7 +957,7 @@
         }
         var card = btn.closest('.art-card');
         var img = card ? card.querySelector('.art-photo') : null;
-        var item = { artworkId: artworkId, option: option, title: title, label: label, price: price, qty: qty, image: img ? img.getAttribute('src') : '' };
+        var item = { artworkId: artworkId, option: option, variant: variant, title: title, label: label, price: price, qty: qty, image: img ? img.getAttribute('src') : '' };
         addToCart(item);
         showAddedToast(item);
       });
@@ -1074,7 +1095,7 @@
         if(result.status !== 'OK'){
           throw new Error((result.errors && result.errors[0] && result.errors[0].message) || 'Could not process the card.');
         }
-        var items = cart.map(function(l){ return { artworkId: l.artworkId, option: l.option, qty: l.qty }; });
+        var items = cart.map(function(l){ return { artworkId: l.artworkId, option: l.option, variant: l.variant || '', qty: l.qty }; });
         return fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
