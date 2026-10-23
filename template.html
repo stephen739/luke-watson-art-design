@@ -692,16 +692,22 @@
 
     var sections = ['home','about','art','contact'].map(function(id){ return document.getElementById(id); });
     var navLinks = Array.prototype.slice.call(document.querySelectorAll('.navlinks a'));
-    if('IntersectionObserver' in window){
-      var navIo = new IntersectionObserver(function(entries){
-        entries.forEach(function(entry){
-          if(entry.isIntersecting){
-            navLinks.forEach(function(a){ a.classList.toggle('active', a.dataset.nav === entry.target.id); });
-          }
-        });
-      }, { threshold: 0.5 });
-      sections.forEach(function(s){ if(s) navIo.observe(s); });
+    // Scroll-spy: the active tab is the last section whose top has passed a reference line near the top
+    // of the screen. (An "N% visible" test fails for tall sections like Art, which never reach it.)
+    function updateNav(){
+      var ref = Math.min(window.innerHeight * 0.35, 280);
+      var current = sections[0] ? sections[0].id : '';
+      sections.forEach(function(sec){ if(sec && sec.getBoundingClientRect().top <= ref) current = sec.id; });
+      // At the very bottom a short last section may never reach the line, so hand it the tab.
+      if(window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 4){
+        var last = sections[sections.length - 1]; if(last) current = last.id;
+      }
+      navLinks.forEach(function(a){ a.classList.toggle('active', a.dataset.nav === current); });
     }
+    window.addEventListener('scroll', updateNav, { passive: true });
+    window.addEventListener('resize', updateNav);
+    window.addEventListener('load', updateNav);
+    updateNav();
 
     var form = document.getElementById('contact-form');
     var success = document.getElementById('cf-success');
