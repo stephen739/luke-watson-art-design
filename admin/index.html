@@ -97,6 +97,14 @@
   .photo.drop-target img{ outline:3px solid var(--gold); outline-offset:2px; }
   .photo.drop-target::after{ content:attr(data-drop-label); position:absolute; left:0; right:0; bottom:30px; text-align:center; font-size:.62rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#fff; background:var(--ink); border-radius:999px; padding:2px 0; pointer-events:none; }
   .photo-ghost{ position:fixed; z-index:50; pointer-events:none; width:84px; height:105px; object-fit:cover; border-radius:8px; border:2px solid var(--gold); box-shadow:0 10px 24px rgba(0,0,0,.28); transform:translate(-50%,-50%) rotate(-3deg); opacity:.92; }
+  .feature-drops{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:560px){ .feature-drops{ grid-template-columns:1fr; } }
+  .feature-drop{ border:2px dashed var(--line); border-radius:16px; padding:18px 20px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; background:var(--paper); }
+  .feature-drop strong{ font-family:var(--display); font-size:1.25rem; letter-spacing:.02em; font-weight:400; text-transform:uppercase; }
+  .feature-drop span{ font-size:.88rem; color:var(--ink-soft); }
+  .feature-drop label.btn{ cursor:pointer; margin-top:6px; }
+  .feature-drop small{ color:var(--ink-soft); }
+  .feature-drop.file-over{ border-color:var(--gold); background:#FFF9E8; }
   .photo-strip.file-over, .digital-file.file-over{ outline:2px dashed var(--gold); outline-offset:6px; border-radius:8px; }
   .print-sizes{ display:flex; flex-direction:column; gap:8px; }
   .print-row{ display:grid; grid-template-columns:minmax(0,1fr) 140px auto; gap:10px; align-items:end; }
@@ -277,8 +285,8 @@
     }
   }
 
-  function fail(msg, actions){
-    setStatus('Not published — see the message above.', 'err');
+  function fail(msg, actions, statusText){
+    setStatus(statusText || 'Not published — see the message above.', 'err');
     setNotice('err', msg, actions);
   }
 
@@ -468,11 +476,63 @@
     return html;
   }
 
+  // Bulk upload: every file dropped on a zone becomes its own item, filed under that zone's category.
+  function featureDropZones(){
+    function zone(label, cat, hint){
+      return '<div class="feature-drop" data-feature-drop="' + esc(cat) + '">' +
+        '<strong>' + label + '</strong><span>' + hint + '</span>' +
+        '<label class="btn btn-small">Choose files<input type="file" accept="image/*" multiple data-feature-upload="' + esc(cat) + '" style="display:none"></label>' +
+        '<small>or drag files here (up to 20 at a time)</small></div>';
+    }
+    return '<div class="feature-drops">' +
+      zone('Upload album art', 'Album Art', 'Cover images — square works best. Each file becomes its own tile.') +
+      zone('Upload logos', 'Logos', 'Logos on a white background look best. Each file becomes its own tile.') +
+      '</div>';
+  }
+
+  function titleFromFileName(name){
+    var t = String(name).replace(/\.[^.]+$/, '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    return t.slice(0, 120) || 'Untitled';
+  }
+
+  async function uploadFeatured(files, category){
+    var picked = Array.prototype.filter.call(files, function(f){ return /^image\//.test(f.type); });
+    if (!picked.length) { fail('Please choose image files (JPG, PNG or WebP).', null, 'Nothing was uploaded — see the message above.'); return; }
+    var skipped = picked.length > 20 ? picked.length - 20 : 0;
+    picked = picked.slice(0, 20);
+    var made = [], failed = [];
+    uploading++;
+    try {
+      for (var i = 0; i < picked.length; i++) {
+        setStatus('Uploading ' + (i + 1) + ' of ' + picked.length + '…');
+        try {
+          var out = await compress(picked[i]);
+          var res = await api('/api/upload', 'POST', { name:picked[i].name, data:out.data });
+          previews[res.path] = out.preview;
+          made.push({ id:'new-' + Math.random().toString(36).slice(2, 8), title:titleFromFileName(picked[i].name), credit:'', category:category, images:[res.path], _new:true });
+        } catch (e) {
+          failed.push(picked[i].name + ' (' + ((e && e.message) || 'failed') + ')');
+        }
+      }
+    } finally { uploading--; }
+    // Keep the order the files were chosen in, at the top of the list.
+    made.slice().reverse().forEach(function(m){ state.content.featured.unshift(m); });
+    if (made.length) markDirty();
+    if (state.tab === 'featured') render();
+    var msg = made.length ? made.length + ' uploaded as ' + category + '. Add a title and credit to each below, then click Save & publish.' : '';
+    if (failed.length || skipped) {
+      fail([made.length ? msg : '', failed.length ? 'Could not upload: ' + failed.join('; ') + '.' : '', skipped ? 'Only the first 20 files were used — upload the other ' + skipped + ' in another batch.' : ''].filter(Boolean).join(' '), null, 'Some files were not uploaded — see the message above.');
+    } else {
+      setStatus(msg);
+    }
+  }
+
   function featuredHtml(){
     var list = state.content.featured;
     var html = '<div class="intro"><div><h2>Design work</h2><p class="help">Album art, logos and other design projects shown in a grid above Contact. Display only — nothing here is for sale. Tip: for logos, a square image on a white background looks best.</p></div>' +
       '<button class="btn btn-primary" type="button" data-action="add-featured">+ Add new item</button></div>';
-    if (!list.length) html += '<div class="card"><p>No design work yet. Click “Add new item” to get started.</p></div>';
+    html += featureDropZones();
+    if (!list.length) html += '<div class="card"><p>No design work yet. Drop files above, or click “Add new item”, to get started.</p></div>';
     list.forEach(function(a, i){
       var cover = a.images[0];
       html += '<section class="card art" data-id="' + esc(a.id) + '">' +
@@ -739,7 +799,7 @@
   document.addEventListener('dragover', function(e){
     if (!hasFiles(e)) return;
     e.preventDefault(); // also stops the browser from navigating away if a file misses the drop zone
-    var strip = e.target.closest && e.target.closest('.photo-strip, .digital-file');
+    var strip = e.target.closest && e.target.closest('.photo-strip, .digital-file, .feature-drop');
     Array.prototype.forEach.call(document.querySelectorAll('.file-over'), function(el){ if (el !== strip) el.classList.remove('file-over'); });
     if (strip) strip.classList.add('file-over');
   });
@@ -750,6 +810,8 @@
     if (!hasFiles(e)) return;
     e.preventDefault();
     Array.prototype.forEach.call(document.querySelectorAll('.file-over'), function(el){ el.classList.remove('file-over'); });
+    var fzone = e.target.closest && e.target.closest('.feature-drop');
+    if (fzone) { if (e.dataTransfer.files.length) uploadFeatured(e.dataTransfer.files, fzone.dataset.featureDrop); return; }
     var zone = e.target.closest && e.target.closest('.digital-file');
     if (zone) {
       var fz = findArt(zone);
@@ -784,6 +846,12 @@
       var fc = findArt(e.target);
       if (fc) { fc.art._prevCategory = fc.art.category || ''; fc.art.category = ''; fc.art._addingCategory = true; markDirty(); render();
         var box = document.querySelector('[data-id="' + fc.art.id + '"] input[data-field="category"]'); if (box) box.focus(); }
+      return;
+    }
+    if (e.target.matches('[data-feature-upload]')) {
+      var chosen = e.target.files, cat = e.target.dataset.featureUpload;
+      if (chosen && chosen.length) uploadFeatured(chosen, cat);
+      e.target.value = '';
       return;
     }
     if (e.target.matches('[data-digital-file]')) {
