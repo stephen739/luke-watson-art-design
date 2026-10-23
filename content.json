@@ -55,6 +55,7 @@
         "images/mountain-lion.jpg",
         "images/mountain-lion-2.jpg"
       ],
+      "fullImage": "images/mountain-lion-full.jpg",
       "sold": false
     },
     {
@@ -191,5 +192,96 @@
       "digitalFileName": ""
     }
   ],
-  "featured": []
+  "featured": [
+    {
+      "id": "2-of-a-kind",
+      "title": "2 of a Kind",
+      "credit": "Sideshow TYLT & Choice · Produced by Franco Pacheco & Braden Dix",
+      "category": "Album Art",
+      "images": [
+        "images/design/2-of-a-kind.jpg"
+      ]
+    },
+    {
+      "id": "can-you-see-the-signs",
+      "title": "Can You See the Signs?",
+      "credit": "Sideshow TYLT",
+      "category": "Album Art",
+      "images": [
+        "images/design/can-you-see-the-signs.jpg"
+      ]
+    },
+    {
+      "id": "lvl-up",
+      "title": "LVL UP!",
+      "credit": "Sideshow TYLT · Produced by Frank3am",
+      "category": "Album Art",
+      "images": [
+        "images/design/lvl-up.jpg"
+      ]
+    },
+    {
+      "id": "my-time",
+      "title": "My Time",
+      "credit": "Sideshow TYLT",
+      "category": "Album Art",
+      "images": [
+        "images/design/my-time.jpg"
+      ]
+    },
+    {
+      "id": "realest-human-ever",
+      "title": "Realest Human Ever",
+      "credit": "Sideshow TYLT · Produced by Drill & Frank",
+      "category": "Album Art",
+      "images": [
+        "images/design/realest-human-ever.jpg"
+      ]
+    },
+    {
+      "id": "big-cat-media",
+      "title": "Big Cat Media",
+      "credit": "Logo design",
+      "category": "Logos",
+      "images": [
+        "images/design/big-cat-media.jpg"
+      ]
+    },
+    {
+      "id": "blackstone-concrete-ventures",
+      "title": "Blackstone Concrete Ventures",
+      "credit": "Logo design",
+      "category": "Logos",
+      "images": [
+        "images/design/blackstone-concrete-ventures.jpg"
+      ]
+    },
+    {
+      "id": "fix-806",
+      "title": "Fix 806",
+      "credit": "Logo & mascot design",
+      "category": "Logos",
+      "images": [
+        "images/design/fix-806.jpg"
+      ]
+    },
+    {
+      "id": "james-vaid-astrophotography",
+      "title": "James Vaid Astrophotography",
+      "credit": "Logo design",
+      "category": "Logos",
+      "images": [
+        "images/design/james-vaid-astrophotography.jpg"
+      ]
+    },
+    {
+      "id": "strawberry-season",
+      "title": "Strawberry Season",
+      "credit": "Logo design",
+      "category": "Logos",
+      "images": [
+        "images/design/strawberry-season.jpg"
+      ]
+    }
+  ]
 }

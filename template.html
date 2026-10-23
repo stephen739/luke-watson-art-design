@@ -789,6 +789,11 @@
       cardIndex.set(visual, 0);
     });
 
+    // What the enlarged viewer shows: the whole-canvas cover when provided, otherwise the card's own images.
+    function lightboxImages(visual){
+      try { if(visual.dataset.lightboxImages) return JSON.parse(visual.dataset.lightboxImages); } catch(e){}
+      return cardImages(visual);
+    }
     function cardImages(visual){
       try { return JSON.parse(visual.dataset.images); } catch(e){ return []; }
     }
@@ -841,10 +846,10 @@
       if(prevBtn) prevBtn.addEventListener('click', function(e){ e.stopPropagation(); stepCard(visual, -1); });
       if(nextBtn) nextBtn.addEventListener('click', function(e){ e.stopPropagation(); stepCard(visual, 1); });
       visual.addEventListener('click', function(){
-        openLightbox(cardImages(visual), cardIndex.get(visual) || 0, title, visual);
+        openLightbox(lightboxImages(visual), cardIndex.get(visual) || 0, title, visual);
       });
       visual.addEventListener('keydown', function(e){
-        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openLightbox(cardImages(visual), cardIndex.get(visual) || 0, title, visual); }
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openLightbox(lightboxImages(visual), cardIndex.get(visual) || 0, title, visual); }
       });
     });
 

@@ -52,6 +52,10 @@ function renderPhoto(p) {
 
 function renderCard(a, options) {
   const multi = a.images.length > 1;
+  // Enlarging shows the whole-canvas version of the cover when one exists; the card thumbnail never changes.
+  const full = a.fullImage || '';
+  const clickable = multi || Boolean(full);
+  const lightbox = full ? [full, ...a.images.slice(1)] : null;
   const nav = multi
     ? `
           <button type="button" class="art-nav prev" aria-label="Previous photo">‹</button>
@@ -60,7 +64,7 @@ function renderCard(a, options) {
     : '';
   return `
       <article class="art-card reveal" data-category="${esc(a.category || '')}" data-sold="${a.sold ? 'true' : 'false'}">
-        <div class="art-visual"${multi ? ` data-images='${JSON.stringify(a.images).replace(/'/g, '&#39;')}' tabindex="0" role="button" aria-label="${esc(`View photos of ${a.title}`)}"` : ''}>
+        <div class="art-visual"${clickable ? ` data-images='${JSON.stringify(a.images).replace(/'/g, '&#39;')}'${lightbox ? ` data-lightbox-images='${JSON.stringify(lightbox).replace(/'/g, '&#39;')}'` : ''} tabindex="0" role="button" aria-label="${esc(`View ${multi ? 'photos' : 'photo'} of ${a.title}`)}"` : ''}>
           <img class="art-photo" src="${esc(a.images[0])}" alt="${esc(`Original artwork: ${a.title}`)}" loading="lazy">${a.sold ? '\n          <span class="sold-badge">Sold</span>' : ''}${nav}
         </div>
         <div class="art-body">
