@@ -124,6 +124,27 @@
   ],
   "photos": [
     {
+      "id": "full-moon-34f",
+      "title": "Full Moon",
+      "blurb": "Shot with a Canon Rebel (Canon 55-250mm) in my backyard, July 2026.",
+      "meta": "",
+      "category": "",
+      "images": [
+        "images/art/mvlhnipi-img-0084-2-2-2.jpg",
+        "images/art/mvlhnu2m-fullmoon.jpg"
+      ],
+      "prints": [
+        {
+          "id": "p4xv06",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": ""
+    },
+    {
       "id": "ocotillo-and-the-chisos-mountains-xme",
       "title": "Ocotillo and The Chisos Mountains",
       "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Big Bend National Park, April 2025.",
