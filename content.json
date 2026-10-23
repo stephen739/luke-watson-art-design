@@ -124,6 +124,27 @@
   ],
   "photos": [
     {
+      "id": "ocotillo-and-the-chisos-mountains-xme",
+      "title": "Ocotillo and The Chisos Mountains",
+      "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Big Bend National Park, April 2025.",
+      "meta": "",
+      "category": "",
+      "images": [
+        "images/art/mvlh5jkq-img-9257.jpg",
+        "images/art/mvlh6eth-ocotillo.jpg"
+      ],
+      "prints": [
+        {
+          "id": "p5d4fi",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": ""
+    },
+    {
       "id": "milky-way-oks",
       "title": "Milky Way",
       "blurb": "Shot with a Canon Rebel (Rokinon 2.8/14mm lens) in the Alvord Desert in SE Oregon, September 2026.",
