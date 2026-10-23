@@ -23,16 +23,16 @@
     "art_heading": "Fresh off the easel",
     "art_intro": "Originals are one of one — reach out below for pricing and availability.",
     "art_note": "",
-    "photo_eyebrow": "Photography",
-    "photo_heading": "Prints & digital downloads",
-    "photo_intro": "Photographs by Luke, available as prints or instant digital downloads.",
-    "photo_empty": "New photography is on the way — check back soon.",
     "sales_tax_rate": "8.25",
     "contact_eyebrow": "Get in touch",
     "contact_heading_top": "Let's make",
     "contact_heading_script": "something good",
     "contact_intro": "Commission a piece, order a print, book Luke for a project, or just say hi — fill out the form and he'll get back to you.",
     "contact_email": "info@lukewatsonart.com",
+    "photo_eyebrow": "Photography",
+    "photo_heading": "Prints & digital downloads",
+    "photo_intro": "Photographs by Luke, available as prints or instant digital downloads.",
+    "photo_empty": "New photography is on the way — check back soon.",
     "footer_text": "Luke Watson Art & Design"
   },
   "artworks": [
@@ -60,7 +60,7 @@
       "meta": "Original — 18\" x 24\" canvas · acrylic & spray paint",
       "canvasPrice": "$350",
       "printPrice": "$30",
-      "digitalPrice": "15",
+      "digitalPrice": "$15",
       "digitalFile": "blob:digital/black-bear-master-lIiT17d3PzgSyPffYbfS3NYNXNuScp.jpg",
       "digitalFileName": "IMG_1301.jpg",
       "category": "Wildlife",
@@ -122,5 +122,27 @@
       "sold": false
     }
   ],
-  "photos": []
+  "photos": [
+    {
+      "id": "milky-way-oks",
+      "title": "Milky Way",
+      "blurb": "Shot with a Canon Rebel (Rokinon 2.8/14mm lens) in the Alvord Deserts in SE Oregon, September 2026.",
+      "meta": "",
+      "category": "",
+      "images": [
+        "images/art/mvlgrstj-img-1189.jpg",
+        "images/art/mvlgwwkn-alvord-milkyway.jpg"
+      ],
+      "prints": [
+        {
+          "id": "phv925",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "blob:digital/milky-way-master-nZdGBo7f6nHihI7Nil20JQJ193NWhN.jpg",
+      "digitalFileName": "IMG_1189.jpg"
+    }
+  ]
 }
