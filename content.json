@@ -198,12 +198,39 @@
   ],
   "featured": [
     {
+      "id": "james-vaid-astrophotography",
+      "title": "James Vaid Astrophotography",
+      "credit": "Logo design",
+      "category": "Logos",
+      "images": [
+        "images/design/james-vaid-astrophotography.jpg"
+      ]
+    },
+    {
       "id": "strawberry-season",
       "title": "Strawberry Season",
       "credit": "Logo design",
       "category": "Logos",
       "images": [
         "images/design/strawberry-season.jpg"
+      ]
+    },
+    {
+      "id": "fix-806",
+      "title": "Fix 806",
+      "credit": "Logo & mascot design",
+      "category": "Logos",
+      "images": [
+        "images/design/fix-806.jpg"
+      ]
+    },
+    {
+      "id": "blackstone-concrete-ventures",
+      "title": "Blackstone Concrete Ventures",
+      "credit": "Logo design",
+      "category": "Logos",
+      "images": [
+        "images/design/blackstone-concrete-ventures.jpg"
       ]
     },
     {
@@ -240,33 +267,6 @@
       "category": "Album Art",
       "images": [
         "images/design/my-time.jpg"
-      ]
-    },
-    {
-      "id": "blackstone-concrete-ventures",
-      "title": "Blackstone Concrete Ventures",
-      "credit": "Logo design",
-      "category": "Logos",
-      "images": [
-        "images/design/blackstone-concrete-ventures.jpg"
-      ]
-    },
-    {
-      "id": "fix-806",
-      "title": "Fix 806",
-      "credit": "Logo & mascot design",
-      "category": "Logos",
-      "images": [
-        "images/design/fix-806.jpg"
-      ]
-    },
-    {
-      "id": "james-vaid-astrophotography",
-      "title": "James Vaid Astrophotography",
-      "credit": "Logo design",
-      "category": "Logos",
-      "images": [
-        "images/design/james-vaid-astrophotography.jpg"
       ]
     },
     {
