@@ -73,6 +73,7 @@
         "images/art/mvfp58uh-blackbear-web.jpg",
         "images/art/mvfp87do-img-1301.jpg"
       ],
+      "fullImage": "",
       "sold": false
     },
     {
@@ -90,6 +91,7 @@
         "images/agave-1.jpg",
         "images/agave-2.jpg"
       ],
+      "fullImage": "",
       "sold": false
     },
     {
@@ -107,6 +109,7 @@
         "images/blue-skull-1.jpg",
         "images/blue-skull-2.jpg"
       ],
+      "fullImage": "",
       "sold": false
     },
     {
@@ -124,6 +127,7 @@
         "images/faces-1.jpg",
         "images/faces-2.jpg"
       ],
+      "fullImage": "",
       "sold": false
     }
   ],
@@ -236,15 +240,6 @@
       "category": "Album Art",
       "images": [
         "images/design/realest-human-ever.jpg"
-      ]
-    },
-    {
-      "id": "big-cat-media",
-      "title": "Big Cat Media",
-      "credit": "Logo design",
-      "category": "Logos",
-      "images": [
-        "images/design/big-cat-media.jpg"
       ]
     },
     {
