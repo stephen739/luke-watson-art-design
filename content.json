@@ -234,30 +234,21 @@
       ]
     },
     {
-      "id": "2-of-a-kind",
-      "title": "2 of a Kind",
-      "credit": "Sideshow TYLT & Choice · Produced by Franco Pacheco & Braden Dix",
-      "category": "Album Art",
-      "images": [
-        "images/design/2-of-a-kind.jpg"
-      ]
-    },
-    {
-      "id": "can-you-see-the-signs",
-      "title": "Can You See the Signs?",
-      "credit": "Sideshow TYLT",
-      "category": "Album Art",
-      "images": [
-        "images/design/can-you-see-the-signs.jpg"
-      ]
-    },
-    {
       "id": "lvl-up",
       "title": "LVL UP!",
       "credit": "Sideshow TYLT · Produced by Frank3am",
       "category": "Album Art",
       "images": [
         "images/design/lvl-up.jpg"
+      ]
+    },
+    {
+      "id": "realest-human-ever",
+      "title": "Realest Human Ever",
+      "credit": "Sideshow TYLT · Produced by Drill & Frank",
+      "category": "Album Art",
+      "images": [
+        "images/design/realest-human-ever.jpg"
       ]
     },
     {
@@ -270,12 +261,12 @@
       ]
     },
     {
-      "id": "realest-human-ever",
-      "title": "Realest Human Ever",
-      "credit": "Sideshow TYLT · Produced by Drill & Frank",
+      "id": "2-of-a-kind",
+      "title": "2 of a Kind",
+      "credit": "Sideshow TYLT & Choice · Produced by Franco Pacheco & Braden Dix",
       "category": "Album Art",
       "images": [
-        "images/design/realest-human-ever.jpg"
+        "images/design/2-of-a-kind.jpg"
       ]
     }
   ]
