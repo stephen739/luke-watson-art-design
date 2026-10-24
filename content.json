@@ -198,6 +198,15 @@
   ],
   "featured": [
     {
+      "id": "strawberry-season",
+      "title": "Strawberry Season",
+      "credit": "Logo design",
+      "category": "Logos",
+      "images": [
+        "images/design/strawberry-season.jpg"
+      ]
+    },
+    {
       "id": "2-of-a-kind",
       "title": "2 of a Kind",
       "credit": "Sideshow TYLT & Choice · Produced by Franco Pacheco & Braden Dix",
@@ -234,15 +243,6 @@
       ]
     },
     {
-      "id": "realest-human-ever",
-      "title": "Realest Human Ever",
-      "credit": "Sideshow TYLT · Produced by Drill & Frank",
-      "category": "Album Art",
-      "images": [
-        "images/design/realest-human-ever.jpg"
-      ]
-    },
-    {
       "id": "blackstone-concrete-ventures",
       "title": "Blackstone Concrete Ventures",
       "credit": "Logo design",
@@ -270,12 +270,12 @@
       ]
     },
     {
-      "id": "strawberry-season",
-      "title": "Strawberry Season",
-      "credit": "Logo design",
-      "category": "Logos",
+      "id": "realest-human-ever",
+      "title": "Realest Human Ever",
+      "credit": "Sideshow TYLT · Produced by Drill & Frank",
+      "category": "Album Art",
       "images": [
-        "images/design/strawberry-season.jpg"
+        "images/design/realest-human-ever.jpg"
       ]
     }
   ]
