@@ -133,18 +133,39 @@
   ],
   "photos": [
     {
-      "id": "ocotillo-and-the-chisos-mountains-2-8bs",
-      "title": "Ocotillo and The Chisos Mountains #2",
-      "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Big Bend National Park, April 2025.",
+      "id": "milky-way-oks",
+      "title": "Milky Way, Alvord Desert",
+      "blurb": "Shot with a Canon Rebel (Rokinon 2.8/14mm lens) in the Alvord Desert in SE Oregon, September 2026.",
       "meta": "",
       "category": "",
       "images": [
-        "images/art/mvqu1mgm-img-9258.jpg",
-        "images/art/mvqtzzth-ocotillo-2.jpg"
+        "images/art/mvlgrstj-img-1189.jpg",
+        "images/art/mvlh0f5a-alvord-milkyway-web.jpg"
       ],
       "prints": [
         {
-          "id": "p990xn",
+          "id": "phv925",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "blob:digital/milky-way-master-nZdGBo7f6nHihI7Nil20JQJ193NWhN.jpg",
+      "digitalFileName": "IMG_1189.jpg"
+    },
+    {
+      "id": "mitre-peak-2m4",
+      "title": "Mitre Peak",
+      "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Davis Mountains State Park, October 2021.",
+      "meta": "",
+      "category": "",
+      "images": [
+        "images/art/mvqttk1c-img-7603-2.jpg",
+        "images/art/mvqttlne-ft-davis.jpg"
+      ],
+      "prints": [
+        {
+          "id": "pqekcy",
           "size": "8\" x 12\"",
           "price": "$25"
         }
@@ -175,27 +196,6 @@
       "digitalFileName": ""
     },
     {
-      "id": "mitre-peak-2m4",
-      "title": "Mitre Peak",
-      "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Davis Mountains State Park, October 2021.",
-      "meta": "",
-      "category": "",
-      "images": [
-        "images/art/mvqttk1c-img-7603-2.jpg",
-        "images/art/mvqttlne-ft-davis.jpg"
-      ],
-      "prints": [
-        {
-          "id": "pqekcy",
-          "size": "8\" x 12\"",
-          "price": "$25"
-        }
-      ],
-      "digitalPrice": "$15",
-      "digitalFile": "",
-      "digitalFileName": ""
-    },
-    {
       "id": "ocotillo-and-the-chisos-mountains-xme",
       "title": "Ocotillo and The Chisos Mountains",
       "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Big Bend National Park, April 2025.",
@@ -217,27 +217,6 @@
       "digitalFileName": ""
     },
     {
-      "id": "milky-way-oks",
-      "title": "Milky Way, Alvord Desert",
-      "blurb": "Shot with a Canon Rebel (Rokinon 2.8/14mm lens) in the Alvord Desert in SE Oregon, September 2026.",
-      "meta": "",
-      "category": "",
-      "images": [
-        "images/art/mvlgrstj-img-1189.jpg",
-        "images/art/mvlh0f5a-alvord-milkyway-web.jpg"
-      ],
-      "prints": [
-        {
-          "id": "phv925",
-          "size": "8\" x 12\"",
-          "price": "$25"
-        }
-      ],
-      "digitalPrice": "$15",
-      "digitalFile": "blob:digital/milky-way-master-nZdGBo7f6nHihI7Nil20JQJ193NWhN.jpg",
-      "digitalFileName": "IMG_1189.jpg"
-    },
-    {
       "id": "full-moon-34f",
       "title": "Full Moon",
       "blurb": "Shot with a Canon Rebel (Canon 55-250mm) in my backyard, July 2026.",
@@ -250,6 +229,27 @@
       "prints": [
         {
           "id": "p4xv06",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": ""
+    },
+    {
+      "id": "ocotillo-and-the-chisos-mountains-2-8bs",
+      "title": "Ocotillo and The Chisos Mountains #2",
+      "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Big Bend National Park, April 2025.",
+      "meta": "",
+      "category": "",
+      "images": [
+        "images/art/mvqu1mgm-img-9258.jpg",
+        "images/art/mvqtzzth-ocotillo-2.jpg"
+      ],
+      "prints": [
+        {
+          "id": "p990xn",
           "size": "8\" x 12\"",
           "price": "$25"
         }
