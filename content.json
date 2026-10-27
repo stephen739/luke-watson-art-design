@@ -133,6 +133,27 @@
   ],
   "photos": [
     {
+      "id": "ocotillo-and-the-chisos-mountains-2-8bs",
+      "title": "Ocotillo and The Chisos Mountains #2",
+      "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Big Bend National Park, April 2025.",
+      "meta": "",
+      "category": "",
+      "images": [
+        "images/art/mvqu1mgm-img-9258.jpg",
+        "images/art/mvqtzzth-ocotillo-2.jpg"
+      ],
+      "prints": [
+        {
+          "id": "p990xn",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": ""
+    },
+    {
       "id": "milky-way-steens-mountain-785",
       "title": "Milky Way, Steens Mountain",
       "blurb": "Shot with a Canon Rebel (Rokinon 2.4/14mm lens) in Steens Mountain in SE Oregon, September 2026.",
