@@ -133,6 +133,27 @@
   ],
   "photos": [
     {
+      "id": "milky-way-steens-mountain-785",
+      "title": "Milky Way, Steens Mountain",
+      "blurb": "Shot with a Canon Rebel (Rokinon 2.4/14mm lens) in Steens Mountain in SE Oregon, September 2026.",
+      "meta": "",
+      "category": "",
+      "images": [
+        "images/art/mvqtvmv6-img-1149.jpg",
+        "images/art/mvqty1yw-steens-milkyway-web.jpg"
+      ],
+      "prints": [
+        {
+          "id": "prbu30",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": ""
+    },
+    {
       "id": "mitre-peak-2m4",
       "title": "Mitre Peak",
       "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Davis Mountains State Park, October 2021.",
@@ -176,7 +197,7 @@
     },
     {
       "id": "milky-way-oks",
-      "title": "Milky Way",
+      "title": "Milky Way, Alvord Desert",
       "blurb": "Shot with a Canon Rebel (Rokinon 2.8/14mm lens) in the Alvord Desert in SE Oregon, September 2026.",
       "meta": "",
       "category": "",
