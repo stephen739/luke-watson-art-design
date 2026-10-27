@@ -41,24 +41,6 @@
   },
   "artworks": [
     {
-      "id": "mountain-lion",
-      "title": "Mountain Lion",
-      "blurb": "",
-      "meta": "Original — 18\" x 24\" canvas · acrylic & spray paint",
-      "canvasPrice": "$300",
-      "printPrice": "$30",
-      "digitalPrice": "$15",
-      "digitalFile": "blob:digital/mountain-lion-master-uqiw9fM9tKM4zmDT5dmjkUKEBSeHmg.jpg",
-      "digitalFileName": "mountain-lion.jpg",
-      "category": "Wildlife",
-      "images": [
-        "images/mountain-lion.jpg",
-        "images/mountain-lion-2.jpg"
-      ],
-      "fullImage": "images/mountain-lion-full.jpg",
-      "sold": false
-    },
-    {
       "id": "black-bear",
       "title": "Black Bear",
       "blurb": "",
@@ -74,6 +56,24 @@
         "images/art/mvfp87do-img-1301.jpg"
       ],
       "fullImage": "",
+      "sold": false
+    },
+    {
+      "id": "mountain-lion",
+      "title": "Mountain Lion",
+      "blurb": "",
+      "meta": "Original — 18\" x 24\" canvas · acrylic & spray paint",
+      "canvasPrice": "$300",
+      "printPrice": "$30",
+      "digitalPrice": "$15",
+      "digitalFile": "blob:digital/mountain-lion-master-uqiw9fM9tKM4zmDT5dmjkUKEBSeHmg.jpg",
+      "digitalFileName": "mountain-lion.jpg",
+      "category": "Wildlife",
+      "images": [
+        "images/mountain-lion.jpg",
+        "images/mountain-lion-2.jpg"
+      ],
+      "fullImage": "images/mountain-lion-full.jpg",
       "sold": false
     },
     {
