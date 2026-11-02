@@ -41,6 +41,24 @@
   },
   "artworks": [
     {
+      "id": "ocotillo-oqy",
+      "title": "Ocotillo",
+      "blurb": "",
+      "meta": "Original — 12\" x 12\" canvas · spray paint & paint markers",
+      "canvasPrice": "$75",
+      "printPrice": "$20",
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": "",
+      "category": "",
+      "images": [
+        "images/art/mvzsvvj0-ocotillo-web.jpg",
+        "images/art/mvzsw1v1-ocotillo.jpg"
+      ],
+      "fullImage": "",
+      "sold": false
+    },
+    {
       "id": "black-bear",
       "title": "Black Bear",
       "blurb": "",
