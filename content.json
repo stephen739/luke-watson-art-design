@@ -95,24 +95,6 @@
       "sold": false
     },
     {
-      "id": "ocotillo-oqy",
-      "title": "Ocotillo",
-      "blurb": "",
-      "meta": "Original — 12\" x 12\" canvas · spray paint & paint markers",
-      "canvasPrice": "$75",
-      "printPrice": "$20",
-      "digitalPrice": "$15",
-      "digitalFile": "",
-      "digitalFileName": "",
-      "category": "Botanical",
-      "images": [
-        "images/art/mvzsvvj0-ocotillo-web.jpg",
-        "images/art/mvzsw1v1-ocotillo.jpg"
-      ],
-      "fullImage": "",
-      "sold": false
-    },
-    {
       "id": "agave",
       "title": "Agave",
       "blurb": "",
@@ -126,6 +108,24 @@
       "images": [
         "images/art/mvzsswvj-agave-web.jpg",
         "images/art/mvzstch6-agave.jpg"
+      ],
+      "fullImage": "",
+      "sold": false
+    },
+    {
+      "id": "ocotillo-oqy",
+      "title": "Ocotillo",
+      "blurb": "",
+      "meta": "Original — 12\" x 12\" canvas · spray paint & paint markers",
+      "canvasPrice": "$75",
+      "printPrice": "$20",
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": "",
+      "category": "Botanical",
+      "images": [
+        "images/art/mvzsvvj0-ocotillo-web.jpg",
+        "images/art/mvzsw1v1-ocotillo.jpg"
       ],
       "fullImage": "",
       "sold": false
