@@ -41,19 +41,19 @@
   },
   "artworks": [
     {
-      "id": "bison-skull-iai",
-      "title": "Bison Skull",
+      "id": "full-moon-vkg",
+      "title": "Full Moon",
       "blurb": "",
-      "meta": "Original — 12\" x 12\" canvas · acrylic & spray paint",
-      "canvasPrice": "$100",
+      "meta": "Original — 12\" x 12\" canvas · acrylic",
+      "canvasPrice": "$125",
       "printPrice": "$20",
       "digitalPrice": "$15",
       "digitalFile": "",
       "digitalFileName": "",
-      "category": "Wildlife",
+      "category": "Cosmos",
       "images": [
-        "images/art/mvzsy1w0-bisonskull-web.jpg",
-        "images/art/mvzsy7nl-bisonskull.jpg"
+        "images/art/mvzt02i0-fullmoon-web.jpg",
+        "images/art/mvzt07hi-fullmoon.jpg"
       ],
       "fullImage": "",
       "sold": false
@@ -92,6 +92,24 @@
         "images/art/mvzizflr-mountainlion.jpg"
       ],
       "fullImage": "images/mountain-lion-full.jpg",
+      "sold": false
+    },
+    {
+      "id": "bison-skull-iai",
+      "title": "Bison Skull",
+      "blurb": "",
+      "meta": "Original — 12\" x 12\" canvas · acrylic & spray paint",
+      "canvasPrice": "$100",
+      "printPrice": "$20",
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": "",
+      "category": "Wildlife",
+      "images": [
+        "images/art/mvzsy1w0-bisonskull-web.jpg",
+        "images/art/mvzsy7nl-bisonskull.jpg"
+      ],
+      "fullImage": "",
       "sold": false
     },
     {
