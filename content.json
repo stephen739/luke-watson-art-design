@@ -41,6 +41,24 @@
   },
   "artworks": [
     {
+      "id": "bison-skull-iai",
+      "title": "Bison Skull",
+      "blurb": "",
+      "meta": "Original — 12\" x 12\" canvas · acrylic & spray paint",
+      "canvasPrice": "$100",
+      "printPrice": "$20",
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": "",
+      "category": "Wildlife",
+      "images": [
+        "images/art/mvzsy1w0-bisonskull-web.jpg",
+        "images/art/mvzsy7nl-bisonskull.jpg"
+      ],
+      "fullImage": "",
+      "sold": false
+    },
+    {
       "id": "black-bear",
       "title": "Black Bear",
       "blurb": "",
@@ -86,7 +104,7 @@
       "digitalPrice": "$15",
       "digitalFile": "",
       "digitalFileName": "",
-      "category": "",
+      "category": "Botanical",
       "images": [
         "images/art/mvzsvvj0-ocotillo-web.jpg",
         "images/art/mvzsw1v1-ocotillo.jpg"
