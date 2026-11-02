@@ -41,24 +41,6 @@
   },
   "artworks": [
     {
-      "id": "yucca-r9s",
-      "title": "Yucca",
-      "blurb": "",
-      "meta": "Original — 12\" x 12\" canvas · spray paint & paint markers",
-      "canvasPrice": "$75",
-      "printPrice": "$20",
-      "digitalPrice": "$15",
-      "digitalFile": "",
-      "digitalFileName": "",
-      "category": "Botanical",
-      "images": [
-        "images/art/mvzsupb3-yucca-web.jpg",
-        "images/art/mvzsuqyj-yucca.jpg"
-      ],
-      "fullImage": "",
-      "sold": false
-    },
-    {
       "id": "black-bear",
       "title": "Black Bear",
       "blurb": "",
@@ -108,6 +90,24 @@
       "images": [
         "images/art/mvzsswvj-agave-web.jpg",
         "images/art/mvzstch6-agave.jpg"
+      ],
+      "fullImage": "",
+      "sold": false
+    },
+    {
+      "id": "yucca-r9s",
+      "title": "Yucca",
+      "blurb": "",
+      "meta": "Original — 12\" x 12\" canvas · spray paint & paint markers",
+      "canvasPrice": "$75",
+      "printPrice": "$20",
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": "",
+      "category": "Botanical",
+      "images": [
+        "images/art/mvzsupb3-yucca-web.jpg",
+        "images/art/mvzsuqyj-yucca.jpg"
       ],
       "fullImage": "",
       "sold": false
