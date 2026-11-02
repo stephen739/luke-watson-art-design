@@ -41,24 +41,6 @@
   },
   "artworks": [
     {
-      "id": "full-moon-vkg",
-      "title": "Full Moon",
-      "blurb": "",
-      "meta": "Original — 12\" x 12\" canvas · acrylic",
-      "canvasPrice": "$125",
-      "printPrice": "$20",
-      "digitalPrice": "$15",
-      "digitalFile": "",
-      "digitalFileName": "",
-      "category": "Cosmos",
-      "images": [
-        "images/art/mvzt02i0-fullmoon-web.jpg",
-        "images/art/mvzt07hi-fullmoon.jpg"
-      ],
-      "fullImage": "",
-      "sold": false
-    },
-    {
       "id": "black-bear",
       "title": "Black Bear",
       "blurb": "",
@@ -162,6 +144,24 @@
       "images": [
         "images/art/mvzsupb3-yucca-web.jpg",
         "images/art/mvzsuqyj-yucca.jpg"
+      ],
+      "fullImage": "",
+      "sold": false
+    },
+    {
+      "id": "full-moon-vkg",
+      "title": "Full Moon",
+      "blurb": "",
+      "meta": "Original — 12\" x 12\" canvas · acrylic",
+      "canvasPrice": "$125",
+      "printPrice": "$20",
+      "digitalPrice": "$15",
+      "digitalFile": "",
+      "digitalFileName": "",
+      "category": "Cosmos",
+      "images": [
+        "images/art/mvzt02i0-fullmoon-web.jpg",
+        "images/art/mvzt07hi-fullmoon.jpg"
       ],
       "fullImage": "",
       "sold": false
