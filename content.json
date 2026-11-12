@@ -41,6 +41,23 @@
   },
   "artworks": [
     {
+      "id": "coyote-53x",
+      "title": "Coyote",
+      "blurb": "",
+      "meta": "Original — 18\" x 24\" canvas · acrylic & spray paint",
+      "canvasPrice": "$300",
+      "printPrice": "$30",
+      "digitalPrice": "$15",
+      "digitalFile": "blob:digital/coyote-master-QfpCw1NuvQ8otpPQfRsibEZ2L79Odo.jpg",
+      "digitalFileName": "Coyote.jpg",
+      "category": "Wildlife",
+      "images": [
+        "images/art/mwe1ce1a-coyote-web.jpg"
+      ],
+      "fullImage": "",
+      "sold": false
+    },
+    {
       "id": "black-bear",
       "title": "Black Bear",
       "blurb": "",
