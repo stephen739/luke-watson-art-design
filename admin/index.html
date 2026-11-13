@@ -57,6 +57,15 @@
   .intro h2{ font-size:1.7rem; }
 
   .card{ background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:20px; }
+  .sq-table{ width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0 6px; }
+  .sq-table th{ text-align:left; font-size:.7rem; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft); padding:8px 10px; border-bottom:1px solid var(--line); }
+  .sq-table td{ padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .sq-table .num{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .sq-chip{ display:inline-block; padding:2px 9px; border-radius:99px; font-size:.74rem; font-weight:700; background:var(--soft); color:var(--ink-soft); }
+  .sq-chip.change{ background:#fff3cd; color:#7a5b00; }
+  .sq-chip.ok{ background:#e3f4e6; color:#1d6b2e; }
+  .sq-scroll{ overflow-x:auto; }
+  .sq-radios{ display:flex; flex-direction:column; gap:8px; margin:12px 0; }
   .art{ display:grid; grid-template-columns:150px 1fr; gap:20px; }
   @media (max-width:640px){ .art{ grid-template-columns:1fr; } }
   .thumb{ width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:12px; background:var(--soft); border:1px solid var(--line); display:block; }
@@ -183,6 +192,7 @@
       <button class="tab" role="tab" id="tab-photos" aria-selected="false" data-tab="photos">Photography</button>
       <button class="tab" role="tab" id="tab-featured" aria-selected="false" data-tab="featured">Design work</button>
       <button class="tab" role="tab" id="tab-text" aria-selected="false" data-tab="text">Site text</button>
+      <button class="tab" role="tab" id="tab-square" aria-selected="false" data-tab="square">Square</button>
     </div>
   </header>
 
@@ -364,7 +374,9 @@
     $('tab-photos').setAttribute('aria-selected', state.tab === 'photos');
     $('tab-featured').setAttribute('aria-selected', state.tab === 'featured');
     $('tab-text').setAttribute('aria-selected', state.tab === 'text');
-    $('main').innerHTML = state.tab === 'art' ? artHtml() : state.tab === 'photos' ? photoHtml() : state.tab === 'featured' ? featuredHtml() : textHtml();
+    $('tab-square').setAttribute('aria-selected', state.tab === 'square');
+    $('main').innerHTML = state.tab === 'art' ? artHtml() : state.tab === 'photos' ? photoHtml() : state.tab === 'featured' ? featuredHtml() : state.tab === 'square' ? squareHtml() : textHtml();
+    if (state.tab === 'square' && !sq.data && !sq.loading) loadSquare();
   }
 
   // Artwork and photography each have their own category list (and filter buttons on the site).
@@ -655,6 +667,65 @@
     return html;
   }
 
+  /* ---------- Square connection ---------- */
+  var sq = { data:null, loading:false, error:'', prefer:'site', result:'' };
+
+  function dollars(c){ return c == null ? '—' : '$' + (c % 100 ? (c / 100).toFixed(2) : String(c / 100)); }
+
+  async function loadSquare(){
+    sq.loading = true; sq.error = '';
+    if (state.tab === 'square') render();
+    try { sq.data = await api('/api/square-sync?prefer=' + sq.prefer); }
+    catch (e) { sq.data = null; sq.error = e.message; }
+    sq.loading = false;
+    if (state.tab === 'square') render();
+  }
+
+  async function runSquareSync(){
+    var d = sq.data;
+    var changes = d ? d.rows.filter(function(r){ return r.action !== 'ok'; }).length : 0;
+    var msg = d && !d.linked
+      ? 'This is the first sync. It will connect your website to Square: existing items with the same name are linked, missing ones are added to Square, and prices that differ follow the ' + (sq.prefer === 'square' ? 'SQUARE' : 'WEBSITE') + ' side. Continue?'
+      : 'Apply ' + changes + ' change' + (changes === 1 ? '' : 's') + ' now?';
+    if (!confirm(msg)) return;
+    sq.loading = true; sq.result = ''; render();
+    try {
+      var r = await api('/api/square-sync', 'POST', { prefer:sq.prefer });
+      sq.data = r;
+      sq.result = 'Done. ' + (r.pulled && r.pulled.length ? 'Website updated from Square: ' + r.pulled.join('; ') + '. ' : '') + 'Square and the website are now linked' + (r.pulled && r.pulled.length ? ' (the website change goes live in about a minute).' : '.');
+      if (r.pulled && r.pulled.length) { lastSaveAt = 0; }
+    } catch (e) { sq.error = e.message; }
+    sq.loading = false; render();
+  }
+
+  function squareHtml(){
+    var d = sq.data;
+    var html = '<div class="intro"><div><h2>Square</h2><p class="help">Keeps prices and sold status the same on your website and in Square. Change a price here and it updates in Square; change it in Square and it updates here.</p></div></div>';
+    html += '<section class="card group">';
+    if (sq.loading && !d) html += '<p class="help">Checking Square…</p>';
+    if (sq.error) html += '<p class="help" style="color:#b3261e"><strong>' + esc(sq.error) + '</strong></p>';
+    if (d) {
+      html += '<p class="help"><strong>Mode:</strong> ' + (d.environment === 'production' ? 'Live Square account' : 'Square test (sandbox) account') +
+        ' &nbsp;·&nbsp; <strong>Square → website:</strong> ' + (d.webhook ? 'on' : 'not on yet (Square change notifications are not set up, so edits made inside Square will not reach the website)') +
+        ' &nbsp;·&nbsp; <strong>Website → Square:</strong> ' + (d.linked || d.applied ? 'on (every Save &amp; publish)' : 'turns on after the first sync below') + '</p>';
+      if (d.warnings && d.warnings.length) html += '<ul class="help">' + d.warnings.map(function(w){ return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>';
+      html += '<div class="sq-radios"><span class="help"><strong>If a price is different in Square and on the website, use:</strong></span>' +
+        '<label class="check"><input type="radio" name="sqprefer" data-sq="prefer" value="site"' + (sq.prefer === 'site' ? ' checked' : '') + '> The website prices (updates Square)</label>' +
+        '<label class="check"><input type="radio" name="sqprefer" data-sq="prefer" value="square"' + (sq.prefer === 'square' ? ' checked' : '') + '> The Square prices (updates the website)</label></div>';
+      html += '<div class="sq-scroll"><table class="sq-table"><thead><tr><th>Piece</th><th>Option</th><th>Website</th><th>Square</th><th>Status</th></tr></thead><tbody>';
+      d.rows.forEach(function(r){
+        html += '<tr><td>' + esc(r.title) + '</td><td>' + esc(r.option) + '</td><td class="num">' + dollars(r.sitePrice) + '</td><td class="num">' + dollars(r.squarePrice) + '</td><td><span class="sq-chip ' + (r.action === 'ok' ? 'ok' : 'change') + '">' + esc(r.note) + '</span></td></tr>';
+      });
+      html += '</tbody></table></div>';
+      if (sq.result) html += '<p class="help"><strong>' + esc(sq.result) + '</strong></p>';
+      html += '<div class="row-actions"><button class="btn btn-small" type="button" data-sq="refresh"' + (sq.loading ? ' disabled' : '') + '>Refresh</button>' +
+        '<button class="btn btn-primary btn-small" type="button" data-sq="sync"' + (sq.loading ? ' disabled' : '') + '>' + (d.linked ? 'Sync now' : 'Connect &amp; sync now') + '</button></div>';
+    } else if (!sq.loading) {
+      html += '<div class="row-actions"><button class="btn btn-small" type="button" data-sq="refresh">Try again</button></div>';
+    }
+    return html + '</section>';
+  }
+
   /* ---------- image handling ---------- */
   function compress(file){
     return new Promise(function(resolve, reject){
@@ -894,6 +965,14 @@
   });
 
   $('main').addEventListener('click', function(e){
+    var sqBtn = e.target.closest('[data-sq]');
+    if (sqBtn) {
+      var act = sqBtn.dataset.sq;
+      if (act === 'prefer') { sq.prefer = sqBtn.value; sq.result = ''; loadSquare(); }
+      else if (act === 'refresh') { sq.result = ''; loadSquare(); }
+      else if (act === 'sync') runSquareSync();
+      return;
+    }
     var jump = e.target.closest('[data-jump]');
     if (jump) {
       var target = document.querySelector('section.card[data-id="' + jump.dataset.jump + '"]');
@@ -1055,6 +1134,8 @@
       syncDirtyUI();
       setNotice(null);
       setStatus('Published! Your changes will be live on the website in about a minute.', 'ok');
+      if (res.square && res.square.ok === false) setNotice('warn', 'Your changes were published, but Square could not be updated (' + res.square.error + '). Open the Square tab and press Sync now to retry.');
+      sq.data = null;
     } catch (e) {
       $('save').disabled = false;
       if (e.status === 409) staleNotice();

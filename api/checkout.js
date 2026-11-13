@@ -1,4 +1,7 @@
+const crypto = require('crypto');
 const square = require('../lib/square');
+const { chargeCart } = require('../lib/squareOrder');
+const { pushToSquare } = require('../lib/squareCatalog');
 const { sendEmail, configured: emailConfigured } = require('../lib/email');
 const { contactEmail } = require('../lib/recipient');
 const { deliverBy } = require('../lib/delivery');
@@ -59,19 +62,30 @@ module.exports = async (req, res) => {
   }
 
   const note = priced.lines.map((l) => `${l.title} (${l.optionLabel}${l.option === 'print' ? ` x${l.qty}` : ''})`).join(', ') + (priced.taxCents ? ` | tax ${(priced.taxCents / 100).toFixed(2)}` : '');
-  const payment = await square.createPayment({ nonce: body.nonce, amountCents: priced.totalCents, buyerEmail, note });
+  const payment = await chargeCart({ nonce: body.nonce, priced, buyerEmail, note, referenceId: crypto.randomUUID() });
   if (!payment.ok) return res.status(402).json({ error: payment.message || 'The card was declined.' });
 
   // Mark any one-of-one canvases sold. Best-effort with one retry against a fresh copy — if this
   // still fails, the payment already succeeded, so we log rather than tell the buyer it failed.
   const soldIds = priced.lines.filter((l) => l.option === 'canvas').map((l) => l.artworkId);
+  let soldContent = null;
   if (soldIds.length) {
     for (let attempt = 0; attempt < 2; attempt++) {
       const fresh = attempt === 0 ? live : await readLiveContent();
       if (!fresh.ok) break;
       const updated = { ...fresh.content, artworks: fresh.content.artworks.map((a) => (soldIds.includes(a.id) ? { ...a, sold: true } : a)) };
       const result = await writeLiveContent(updated, fresh.sha, `Checkout: mark ${soldIds.join(', ')} sold [skip ci]`);
-      if (result.status === 200) break;
+      if (result.status === 200) {
+        soldContent = updated;
+        break;
+      }
+    }
+    // Keep Square's stock count for the original in step (best-effort; Square also decrements on the sale itself).
+    try {
+      const stock = await pushToSquare(soldContent || { ...live.content, artworks: live.content.artworks.map((a) => (soldIds.includes(a.id) ? { ...a, sold: true } : a)) }, { mode: 'steady', only: new Set(soldIds.map((id) => `${id}|sold`)) });
+      if (!stock.ok) console.error('checkout: could not update Square stock:', stock.message);
+    } catch (e) {
+      console.error('checkout: Square stock update failed:', e?.message);
     }
   }
 

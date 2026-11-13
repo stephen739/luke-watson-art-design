@@ -1,6 +1,9 @@
 const { BRANCH, reject, github, ghError } = require('../lib/portal');
 const { readLiveContent } = require('../lib/github');
 const { validateContent } = require('../lib/schema');
+const square = require('../lib/square');
+const { pushToSquare } = require('../lib/squareCatalog');
+const { changedKeys } = require('../lib/squareSync');
 
 // A portal page that was opened before a feature shipped doesn't know about its data (new lists, new
 // per-item fields) and would send them back missing, silently erasing them. Anything the page did not
@@ -43,6 +46,14 @@ module.exports = async (req, res) => {
   const sha = req.body?.sha;
   if (typeof sha !== 'string' || !/^[0-9a-f]{40}$/.test(sha)) return res.status(400).json({ error: 'Missing version. Reload the page.' });
 
+  // The copy being replaced tells us which prices / sold flags this save actually changed, so only those
+  // are sent to Square (a price Luke changed in Square is never overwritten by an unrelated edit).
+  let before = null;
+  if (square.configured()) {
+    const live = await readLiveContent().catch(() => ({ ok: false }));
+    if (live.ok) before = live.content;
+  }
+
   const { status, data } = await github('PUT', 'contents/content.json', {
     message: 'Portal: update site content',
     content: Buffer.from(JSON.stringify(clean, null, 2) + '\n').toString('base64'),
@@ -50,5 +61,19 @@ module.exports = async (req, res) => {
     branch: BRANCH,
   });
   if (status !== 200) return res.status(status === 409 || status === 422 ? 409 : 502).json({ error: ghError(status) });
-  res.status(200).json({ ok: true, sha: data.content.sha, content: clean });
+
+  let squareResult = null;
+  if (before) {
+    try {
+      const only = changedKeys(before, clean);
+      if (only.size) {
+        const r = await pushToSquare(clean, { mode: 'steady', only });
+        squareResult = r.skipped ? { skipped: true } : r.ok ? { ok: true, updated: r.writes, stock: r.stockUpdates } : { ok: false, error: r.message };
+      }
+    } catch (e) {
+      squareResult = { ok: false, error: 'Square could not be updated.' };
+    }
+    if (squareResult && squareResult.ok === false) console.error('portal save: Square sync failed:', squareResult.error);
+  }
+  res.status(200).json({ ok: true, sha: data.content.sha, content: clean, square: squareResult });
 };
