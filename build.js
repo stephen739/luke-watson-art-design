@@ -30,11 +30,11 @@ function optionRow({ artworkId, title, option, variant, label, price, sold, qtyI
           </div>`;
 }
 
-function renderArtwork(a) {
+function renderArtwork(a, { digital = true } = {}) {
   const options = [
     optionRow({ artworkId: a.id, title: a.title, option: 'canvas', label: 'Original Canvas', price: a.canvasPrice, sold: a.sold }),
     optionRow({ artworkId: a.id, title: a.title, option: 'print', label: 'Print', price: a.printPrice, qtyId: `qty-${a.id}-print` }),
-    optionRow({ artworkId: a.id, title: a.title, option: 'digital', label: 'Digital Download', price: a.digitalPrice }),
+    digital && a.digitalPrice ? optionRow({ artworkId: a.id, title: a.title, option: 'digital', label: 'Digital Download', price: a.digitalPrice }) : '',
   ].join('');
   return renderCard(a, options);
 }
@@ -120,7 +120,7 @@ const blocks = {
     .map((x, i) => `<p class="reveal"${i === 0 ? ' style="margin-top:22px;"' : ''}>${esc(x)}</p>`)
     .join('\n      '),
   '<!--ARTWORKS-->': content.artworks.length
-    ? content.artworks.map(renderArtwork).join('\n')
+    ? content.artworks.map((a) => renderArtwork(a, { digital: t.art_digital !== 'off' })).join('\n')
     : '<p class="art-empty">New work is on the way — check back soon.</p>',
   '<!--ART_FILTERS-->': filterBar(content.artworks, 'art-grid', true),
   '<!--PHOTOS-->': content.photos.length

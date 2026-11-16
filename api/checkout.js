@@ -46,7 +46,7 @@ module.exports = async (req, res) => {
 
   let priced;
   try {
-    priced = priceCart(catalog(live.content), { items: body.items, fulfillment: body.fulfillment, shippingState: body.shipping?.state, taxRatePercent: live.content.text.sales_tax_rate });
+    priced = priceCart(catalog(live.content), { items: body.items, fulfillment: body.fulfillment, shippingState: body.shipping?.state, taxRatePercent: live.content.text.sales_tax_rate, artDigital: live.content.text.art_digital !== 'off' });
   } catch (e) {
     if (e instanceof HttpError) return res.status(e.status).json({ error: e.message });
     return res.status(500).json({ error: 'Something went wrong pricing your order.' });

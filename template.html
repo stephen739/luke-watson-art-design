@@ -892,7 +892,10 @@
 
     function loadCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch(e){ return []; } }
     function saveCart(){ try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){} }
-    var cart = loadCart();
+    var cart = loadCart().filter(function(l){
+      if (l.option !== 'digital') return true;
+      return !!document.querySelector('.add-to-cart[data-artwork="' + l.artworkId + '"][data-option="digital"]');
+    });
 
     function cartHasDigital(){ return cart.some(function(l){ return l.option === 'digital'; }); }
     function cartHasPhysical(){ return cart.some(function(l){ return l.option === 'canvas' || l.option === 'print'; }); }

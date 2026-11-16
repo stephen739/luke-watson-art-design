@@ -281,3 +281,47 @@ test('if Square refuses to pay the order (400), the buyer is still charged via a
   assert.equal(w.payments.length, 1);
   assert.equal(w.orders[0].state, 'CANCELED');
 });
+
+// ---- paintings' digital download switch ----
+const { validateContent } = require('../lib/schema');
+const { desiredItems } = require('../lib/squareSync');
+
+test('with art_digital off: paintings lose the digital option, photography keeps it', () => {
+  const off = fixtures();
+  off.text.art_digital = 'off';
+  const art = desiredItems(off).find((d) => d.id === 'coyote-53x');
+  assert.deepEqual(art.variations.map((v) => v.key), ['canvas', 'print']);
+  assert.ok(desiredItems(off).find((d) => d.id === 'milky-way').variations.some((v) => v.key === 'digital'));
+  // checkout refuses a painting download but sells the photo download
+  assert.throws(() => priceCart(catalog(off), { items: [{ artworkId: 'faces', option: 'digital' }], artDigital: false }), /aren't available/);
+  assert.doesNotThrow(() => priceCart(catalog(off), { items: [{ artworkId: 'milky-way', option: 'digital' }], artDigital: false }));
+  assert.doesNotThrow(() => priceCart(catalog(off), { items: [{ artworkId: 'faces', option: 'digital' }] })); // default on
+});
+
+test('schema: art_digital defaults to on, only "off" turns it off, and digital price is optional while off', () => {
+  assert.equal(validateContent(fixtures()).text.art_digital, 'on');
+  const off = fixtures();
+  off.text.art_digital = 'off';
+  off.artworks[0].digitalPrice = '';
+  assert.equal(validateContent(off).text.art_digital, 'off');
+  const on = fixtures();
+  on.artworks[0].digitalPrice = '';
+  assert.throws(() => validateContent(on), /needs all three prices/);
+  const junk = fixtures();
+  junk.text.art_digital = 'maybe';
+  assert.equal(validateContent(junk).text.art_digital, 'on');
+});
+
+test('toggling art_digital back on creates the painting digital variations in Square', async () => {
+  const off = fixtures();
+  off.text.art_digital = 'off';
+  const w = makeWorld({ content: off, items: [manualCoyote()] });
+  install(w);
+  await manualSync({ prefer: 'site', apply: true });
+  const coyote = w.items.find((i) => i.id === 'MANUAL_COYOTE');
+  assert.ok(!coyote.item_data.variations.some((v) => v.item_variation_data.sku === 'lw:coyote-53x:digital'));
+  const on = fixtures();
+  const r = await pushToSquare(on, { mode: 'steady', only: changedKeys(off, on) });
+  assert.equal(r.ok, true);
+  assert.ok(coyote.item_data.variations.some((v) => v.item_variation_data.sku === 'lw:coyote-53x:digital'));
+});

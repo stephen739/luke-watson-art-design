@@ -15,10 +15,12 @@ async function carryOverMissing(incoming) {
   if (!incoming || typeof incoming !== 'object') return incoming;
   const lacksList = LIST_KEYS.some((k) => incoming[k] === undefined);
   const lacksFullImage = Array.isArray(incoming.artworks) && incoming.artworks.some((a) => a && typeof a === 'object' && a.fullImage === undefined);
-  if (!lacksList && !lacksFullImage) return incoming;
+  const lacksArtDigital = incoming.text && typeof incoming.text === 'object' && incoming.text.art_digital === undefined;
+  if (!lacksList && !lacksFullImage && !lacksArtDigital) return incoming;
   const live = await readLiveContent();
   if (!live.ok) throw Object.assign(new Error(ghError(live.status)), { status: 502 });
   const merged = { ...incoming };
+  if (lacksArtDigital && live.content.text?.art_digital !== undefined) merged.text = { ...incoming.text, art_digital: live.content.text.art_digital };
   for (const k of LIST_KEYS) if (merged[k] === undefined) merged[k] = live.content[k] ?? [];
   if (lacksFullImage) {
     const liveById = new Map((live.content.artworks || []).map((a) => [a.id, a]));

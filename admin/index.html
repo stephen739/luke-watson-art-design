@@ -412,6 +412,8 @@
     var list = state.content.artworks;
     var html = '<div class="intro"><div><h2>Artwork</h2><p class="help">Pieces appear on the website in this order.</p></div>' +
       '<button class="btn btn-primary" type="button" data-action="add">+ Add new piece</button></div>';
+    html += '<section class="card" style="margin-bottom:18px"><label class="check"><input type="checkbox" data-artdigital' + (state.content.text.art_digital === 'off' ? '' : ' checked') + '> Offer Digital Downloads on paintings</label>' +
+      '<p class="help" style="margin:8px 0 0">' + (state.content.text.art_digital === 'off' ? '<strong>Currently OFF</strong> — paintings show only the Original Canvas and Print options. Prices and uploaded files are kept, so turning this back on restores everything. Photography is not affected.' : 'Turn this off to hide the Digital Download option on every painting (for example at a trade show). Prices and files are kept. Photography is not affected.') + '</p></section>';
     if (!list.length) html += '<div class="card"><p>No artwork yet. Click “Add new piece” to get started.</p></div>';
     list.forEach(function(a, i){
       var cover = a.images[0];
@@ -941,6 +943,7 @@
   });
 
   $('main').addEventListener('change', function(e){
+    if (e.target.matches('[data-artdigital]')) { state.content.text.art_digital = e.target.checked ? 'on' : 'off'; markDirty(); render(); return; }
     if (e.target.matches('select[data-field="category"]') && e.target.value === '__new__') {
       var fc = findArt(e.target);
       if (fc) { fc.art._prevCategory = fc.art.category || ''; fc.art.category = ''; fc.art._addingCategory = true; markDirty(); render();
@@ -1075,7 +1078,8 @@
     for (var i = 0; i < list.length; i++) {
       if (!list[i].title.trim()) { state.tab = 'art'; render(); fail('Every piece needs a title.'); return; }
       if (!list[i].images.length) { state.tab = 'art'; render(); fail('"' + list[i].title + '" needs at least one photo.'); return; }
-      if (!list[i].canvasPrice.trim() || !list[i].printPrice.trim() || !list[i].digitalPrice.trim()) { state.tab = 'art'; render(); fail('"' + list[i].title + '" needs all three prices (canvas, print, digital).'); return; }
+      var needDigital = state.content.text.art_digital !== 'off';
+      if (!list[i].canvasPrice.trim() || !list[i].printPrice.trim() || (needDigital && !list[i].digitalPrice.trim())) { state.tab = 'art'; render(); fail('"' + list[i].title + '" needs ' + (needDigital ? 'all three prices (canvas, print, digital).' : 'a canvas and a print price.')); return; }
     }
     var photoList = state.content.photos || [];
     for (var pi = 0; pi < photoList.length; pi++) {
