@@ -24,6 +24,7 @@
     "art_intro": "Originals are one of one — reach out below for pricing and availability.",
     "art_note": "",
     "sales_tax_rate": "8.25",
+    "art_digital": "off",
     "contact_eyebrow": "Get in touch",
     "contact_heading_top": "Let's make",
     "contact_heading_script": "something good",
@@ -37,8 +38,7 @@
     "feat_heading": "Logos and Album Art",
     "feat_intro": "A selection of album art and logos Luke has designed. For display only — not for sale. Need something designed? Get in touch below.",
     "feat_empty": "Featured design work is coming soon.",
-    "footer_text": "Luke Watson Art & Design",
-    "art_digital": "off"
+    "footer_text": "Luke Watson Art & Design"
   },
   "artworks": [
     {
@@ -262,8 +262,8 @@
         }
       ],
       "digitalPrice": "$15",
-      "digitalFile": "",
-      "digitalFileName": ""
+      "digitalFile": "blob:digital/mitre-peak-master-eGmKkOrmp4a9VVR0tKs3bOjbFcfWVE.jpg",
+      "digitalFileName": "Mitre_Peak_Web.jpg"
     },
     {
       "id": "milky-way-steens-mountain-785",
@@ -304,8 +304,8 @@
         }
       ],
       "digitalPrice": "$15",
-      "digitalFile": "",
-      "digitalFileName": ""
+      "digitalFile": "blob:digital/ocotillo-and-the-chisos-mountains-master-UXFnIvAkTajcHIM3xBKlJeQmdNFevc.jpg",
+      "digitalFileName": "Ocotillo_Web.jpg"
     },
     {
       "id": "full-moon-34f",
@@ -346,8 +346,8 @@
         }
       ],
       "digitalPrice": "$15",
-      "digitalFile": "",
-      "digitalFileName": ""
+      "digitalFile": "blob:digital/ocotillo-and-the-chisos-mountains-2-master-NwrQDYweWweN29xmsDhFkwBOLFHEy7.jpg",
+      "digitalFileName": "Ocotillo2_Web.jpg"
     }
   ],
   "featured": [
