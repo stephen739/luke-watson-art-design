@@ -1,7 +1,7 @@
 // Pinned content so tests never depend on whatever the client has published.
 module.exports = () => ({
   // Real, always-valid site text; only the catalog below is pinned.
-  text: { ...require('../content.json').text, sales_tax_rate: '8.25' },
+  text: { ...require('../content.json').text, sales_tax_rate: '8.25', art_digital: 'on' },
   artworks: [
     { id: 'coyote-53x', title: 'Coyote', canvasPrice: '$300', printPrice: '$30', digitalPrice: '$15', digitalFile: '', images: ['images/art/test.jpg'], category: 'Wildlife', blurb: '', meta: '', sold: false },
     { id: 'faces', title: 'Faces', canvasPrice: '$75', printPrice: '$20', digitalPrice: '$15', digitalFile: '', images: ['images/art/test.jpg'], category: 'Wildlife', blurb: '', meta: '', sold: false },
