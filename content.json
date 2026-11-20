@@ -75,7 +75,7 @@
         "images/art/mvfp87do-img-1301.jpg"
       ],
       "fullImage": "",
-      "sold": false
+      "sold": true
     },
     {
       "id": "mountain-lion",
@@ -93,7 +93,7 @@
         "images/art/mvzizflr-mountainlion.jpg"
       ],
       "fullImage": "images/mountain-lion-full.jpg",
-      "sold": false
+      "sold": true
     },
     {
       "id": "bison-skull-iai",
