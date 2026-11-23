@@ -245,6 +245,27 @@
       "digitalFileName": "Alvord_MilkyWay.jpg"
     },
     {
+      "id": "full-moon-34f",
+      "title": "Full Moon",
+      "blurb": "Shot with a Canon Rebel (Canon 55-250mm) in my backyard, July 2026.",
+      "meta": "",
+      "category": "Astro",
+      "images": [
+        "images/art/mvlhnipi-img-0084-2-2-2.jpg",
+        "images/art/mvlyukfr-fullmoon-web.jpg"
+      ],
+      "prints": [
+        {
+          "id": "p4xv06",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "blob:digital/full-moon-master-4CxwKuWOpPWWFsFB11p9UsowUoMmU4.jpg",
+      "digitalFileName": "FullMoon.jpg"
+    },
+    {
       "id": "mitre-peak-2m4",
       "title": "Mitre Peak",
       "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Davis Mountains State Park, October 2021.",
@@ -285,27 +306,6 @@
       "digitalPrice": "$15",
       "digitalFile": "blob:digital/ocotillo-and-the-chisos-mountains-master-w0kmvKLxJwhb9Jsr86M0d2C1kph163.jpg",
       "digitalFileName": "Ocotillo.jpg"
-    },
-    {
-      "id": "full-moon-34f",
-      "title": "Full Moon",
-      "blurb": "Shot with a Canon Rebel (Canon 55-250mm) in my backyard, July 2026.",
-      "meta": "",
-      "category": "Astro",
-      "images": [
-        "images/art/mvlhnipi-img-0084-2-2-2.jpg",
-        "images/art/mvlyukfr-fullmoon-web.jpg"
-      ],
-      "prints": [
-        {
-          "id": "p4xv06",
-          "size": "8\" x 12\"",
-          "price": "$25"
-        }
-      ],
-      "digitalPrice": "$15",
-      "digitalFile": "blob:digital/full-moon-master-4CxwKuWOpPWWFsFB11p9UsowUoMmU4.jpg",
-      "digitalFileName": "FullMoon.jpg"
     },
     {
       "id": "ocotillo-and-the-chisos-mountains-2-8bs",
