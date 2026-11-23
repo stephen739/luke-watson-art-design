@@ -275,13 +275,7 @@
         "images/art/mvqtvmv6-img-1149.jpg",
         "images/art/mvqty1yw-steens-milkyway-web.jpg"
       ],
-      "prints": [
-        {
-          "id": "prbu30",
-          "size": "8\" x 12\"",
-          "price": "$25"
-        }
-      ],
+      "prints": [],
       "digitalPrice": "$15",
       "digitalFile": "blob:digital/milky-way-steens-mountain-master-Nhy0Tl3aKI0fHN4SMP2du7Qx8kYC15.jpg",
       "digitalFileName": "Steens_MilkyWay.jpg"
