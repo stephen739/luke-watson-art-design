@@ -266,27 +266,6 @@
       "digitalFileName": "FullMoon.jpg"
     },
     {
-      "id": "mitre-peak-2m4",
-      "title": "Mitre Peak",
-      "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Davis Mountains State Park, October 2021.",
-      "meta": "",
-      "category": "Landscape",
-      "images": [
-        "images/art/mvqttk1c-img-7603-2.jpg",
-        "images/art/mvqttlne-ft-davis.jpg"
-      ],
-      "prints": [
-        {
-          "id": "pqekcy",
-          "size": "8\" x 12\"",
-          "price": "$25"
-        }
-      ],
-      "digitalPrice": "$15",
-      "digitalFile": "blob:digital/mitre-peak-master-DB8GHqFzpG8DcehMNhafWjWcO0iZVY.jpg",
-      "digitalFileName": "Mitre_Peak.jpg"
-    },
-    {
       "id": "ocotillo-and-the-chisos-mountains-xme",
       "title": "Ocotillo and The Chisos Mountains",
       "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Big Bend National Park, April 2025.",
@@ -306,6 +285,27 @@
       "digitalPrice": "$15",
       "digitalFile": "blob:digital/ocotillo-and-the-chisos-mountains-master-w0kmvKLxJwhb9Jsr86M0d2C1kph163.jpg",
       "digitalFileName": "Ocotillo.jpg"
+    },
+    {
+      "id": "mitre-peak-2m4",
+      "title": "Mitre Peak",
+      "blurb": "Shot with a Canon Rebel (Canon 55-250mm lens) in Davis Mountains State Park, October 2021.",
+      "meta": "",
+      "category": "Landscape",
+      "images": [
+        "images/art/mvqttk1c-img-7603-2.jpg",
+        "images/art/mvqttlne-ft-davis.jpg"
+      ],
+      "prints": [
+        {
+          "id": "pqekcy",
+          "size": "8\" x 12\"",
+          "price": "$25"
+        }
+      ],
+      "digitalPrice": "$15",
+      "digitalFile": "blob:digital/mitre-peak-master-DB8GHqFzpG8DcehMNhafWjWcO0iZVY.jpg",
+      "digitalFileName": "Mitre_Peak.jpg"
     },
     {
       "id": "ocotillo-and-the-chisos-mountains-2-8bs",
